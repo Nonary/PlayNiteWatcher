@@ -1,0 +1,1 @@
+powershell.exe -executionpolicy bypass -file ./WatcherInstaller.ps1
