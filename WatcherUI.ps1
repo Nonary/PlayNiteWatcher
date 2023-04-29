@@ -11,7 +11,11 @@ $scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
 
-. $scriptPath\PrepCommandInstaller.ps1 $true
+$scopedInstall = {
+    . $scriptPath\PrepCommandInstaller.ps1 $true
+}
+
+& $scopedInstall
 
 function GetPlayniteExecutablePath($apps) { 
     foreach ($app in $apps) { 
