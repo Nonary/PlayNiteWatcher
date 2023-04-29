@@ -2,9 +2,11 @@ $isAdmin = [bool]([System.Security.Principal.WindowsIdentity]::GetCurrent().grou
 
 # If the current user is not an administrator, re-launch the script with elevated privileges
 if (-not $isAdmin) {
-    Start-Process powershell.exe  -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -NoExit -File `"$($MyInvocation.MyCommand.Path)`""
+    Start-Process powershell.exe  -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`"" -WindowStyle Hidden
     exit
 }
+
+$scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
@@ -54,32 +56,26 @@ function LoadGames($configPath) {
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Margin="10">
             <Label Content="PlayNite Executable:" VerticalAlignment="Center"/>
-            <TextBox Name="PlayNightTextBox" Text="C:\Program Files\Sunshine\config\apps.json" Margin="5,0,5,0" Width="400"/>
-            <Button Name="BrowseButton" Content="Browse" Width="75"/>
-        </DockPanel>
-        <DockPanel Grid.Row="1" Margin="10">
-            <Label Content="Config file:" VerticalAlignment="Center"/>
             <TextBox Name="ConfigPath" Text="C:\Program Files\Sunshine\config\apps.json" Margin="5,0,5,0" Width="400"/>
             <Button Name="BrowseButton" Content="Browse" Width="75"/>
         </DockPanel>
-        <GroupBox Grid.Row="2" Header="PlayNite Games" Margin="10">
+        <GroupBox Grid.Row="1" Header="PlayNite Games" Margin="10">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Name="GameList"/>
             </ScrollViewer>
         </GroupBox>
-        <DockPanel Grid.Row="3" Margin="10">
+        <DockPanel Grid.Row="2" Margin="10">
             <TextBlock TextWrapping="Wrap" Width="400">Check the games you wish to have Sunshine end the stream when the game closes.</TextBlock>
             <Button Name="CheckAllButton" Content="Check All" Width="75" Margin="5,0,5,0"/>
 
         </DockPanel>
-        <DockPanel Grid.Row="4" Margin="10">
+        <DockPanel Grid.Row="3" Margin="10">
             <Button Name="InstallButton" Content="Install" Width="75" Margin="5,0,5,0"/>
             <Button Name="ExitButton" Content="Exit" Width="75"/>
         </DockPanel>
@@ -137,7 +133,7 @@ $window.FindName("InstallButton").Add_Click({
 
             if ($checkBox.IsChecked) {
                 $app.PSObject.Properties.Remove('detached')
-                $app | Add-Member -MemberType NoteProperty -Name "cmd" -Value "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"`"F:\sources\PlayNiteWatcher\PlayniteWatcher.ps1`"`" $id" -Force
+                $app | Add-Member -MemberType NoteProperty -Name "cmd" -Value "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" $id" -Force
             }
             else {
                 $app.PSObject.Properties.Remove('cmd')
@@ -147,9 +143,8 @@ $window.FindName("InstallButton").Add_Click({
         }
 
         SaveChanges -configPath $configPathTextBox.Text -updatedApps $updatedApps -JsonContent $JsonContent
-        $icon = [System.Windows.Forms.MessageBoxIcon]::Information
-        $title = "Installation Complete!"
-        [System.Windows.Forms.MessageBox]::Show("You can now close this application, the script has been succesfully installed to the selected applications", $title, $icon)
+        [System.Windows.Forms.MessageBox]::Show("You can now close this application, the script has been successfully installed to the selected applications", "Installation Complete!")
+
     })
 
 # Show WPF window
