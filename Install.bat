@@ -1,1 +1,1 @@
-powershell.exe -executionpolicy bypass -file ./WatcherInstaller.ps1
+powershell.exe -executionpolicy bypass -file ./WatcherUI.ps1

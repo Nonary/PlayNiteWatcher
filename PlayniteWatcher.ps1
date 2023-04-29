@@ -1,5 +1,11 @@
 param($playNiteId)
 
+$gamePath = $null
+$path = Split-Path $MyInvocation.MyCommand.Path -Parent
+
+Start-Transcript $path\log.txt
+
+
 try {
     # To allow other powershell scripts to communicate to this one.
     Start-Job -Name "Playnite-WatcherJob" -ScriptBlock {
@@ -19,6 +25,22 @@ try {
         }
     }
 
+    Start-Job -Name "PlayniteWatcher-OnStreamStart" -ScriptBlock {
+        $pipeName = "PlayniteWatcher-OnStreamStart"
+        Remove-Item "\\.\pipe\$pipeName" -ErrorAction Ignore
+        $pipe = New-Object System.IO.Pipes.NamedPipeServerStream($pipeName, [System.IO.Pipes.PipeDirection]::In, 1, [System.IO.Pipes.PipeTransmissionMode]::Byte, [System.IO.Pipes.PipeOptions]::Asynchronous)
+
+        $streamReader = New-Object System.IO.StreamReader($pipe)
+        Write-Host "Waiting for named pipe to recieve game information"
+        $pipe.WaitForConnection()
+
+        $message = $streamReader.ReadLine()
+    
+        Write-Output $message
+        $pipe.Dispose()
+        $streamReader.Dispose()
+    }
+
 
     Start-Process "F:\\Software\\Playnite\\Playnite.DesktopApp.exe" -ArgumentList "--start $playNiteId"
 
@@ -26,6 +48,7 @@ try {
         Start-Sleep -Seconds 1
 
         $playJob = Get-Job -Name "Playnite-WatcherJob"
+        $streamStartJob = Get-Job -Name "PlayniteWatcher-OnStreamStart" -ErrorAction SilentlyContinue
 
         if ($playJob.State -eq "Completed") {
             Start-Sleep -Seconds 1
@@ -33,12 +56,22 @@ try {
             $playJob | Remove-Job
             break;
         }
+
+        if ($null -eq $gamePath -and $streamStartJob.State -eq "Completed") {
+            Write-Host "Stream started event recieved, now saving game path to file for retrieval later"
+            [string]$gamePath = $streamStartJob | Receive-Job
+            $streamStartJob | Remove-Job
+            Set-Content -Path $path\currentGamePath.txt -Value $gamePath
+        }
     }
 }
 finally {
     Write-Host "Terminating..."
     Remove-Item "\\.\pipe\PlayniteWatcher" -ErrorAction Ignore
+    Remove-Item "\\.\pipe\PlayniteWatcher-OnStreamStart" -ErrorAction Ignore
     Remove-Job -Name "Playnite-WatcherJob" -ErrorAction Ignore
+    Remove-Job -Name "PlayniteWatcher-OnStreamStart" -ErrorAction Ignore
+    Stop-Transcript
 }
 
 

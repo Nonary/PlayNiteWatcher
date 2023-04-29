@@ -11,6 +11,8 @@ $scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
 
+. $scriptPath\PrepCommandInstaller.ps1 $true
+
 function GetPlayniteExecutablePath($apps) { 
     foreach ($app in $apps) { 
         if ($app.PSObject.Properties.Name -contains 'detached') { 

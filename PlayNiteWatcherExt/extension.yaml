@@ -1,0 +1,6 @@
+﻿Id: PlayniteWatcher_afc7879d-9866-4c66-9e87-b95ade2fd930
+Name: Sunshine Playnite Watcher
+Author: Chase Payne
+Version: 1.0
+Module: PlayniteWatcherExtension.psm1
+Type: Script
