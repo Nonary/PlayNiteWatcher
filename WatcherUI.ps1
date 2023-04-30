@@ -7,6 +7,7 @@ if (-not $isAdmin) {
 }
 
 $scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
+Set-Location $scriptPath
 $sunshineApps = $null
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
@@ -134,6 +135,7 @@ $window.FindName("InstallButton").Add_Click({
 
         $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
         $playnitePath = $playNitePathTextBox.Text
+        $playniteRoot = Split-Path $playnitePath -Parent
         $updatedApps = $JsonContent.apps.Clone()
 
         foreach ($checkBox in $gameList.Children) {
@@ -151,7 +153,7 @@ $window.FindName("InstallButton").Add_Click({
                 $app | Add-Member -MemberType NoteProperty -Name "detached" -Value @("$playnitePath --start $id") -Force
             }
         }
-
+        Copy-Item -Path "./PlayNiteWatcherExt"  -Destination "$playniteRoot\Extensions\PlayNiteWatcherExt" -Force  -Recurse
         SaveChanges -configPath $configPathTextBox.Text -updatedApps $updatedApps -JsonContent $JsonContent
 
         $scopedInstall = {
@@ -174,6 +176,7 @@ $window.FindName("UninstallButton").Add_Click({
         if ($msgBoxResult -eq [System.Windows.Forms.DialogResult]::Yes) {
             $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
             $playnitePath = $playNitePathTextBox.Text
+            $playniteRoot = Split-Path $playnitePath -Parent
             $updatedApps = $JsonContent.apps.Clone()
     
             foreach ($checkBox in $gameList.Children) {
@@ -193,6 +196,8 @@ $window.FindName("UninstallButton").Add_Click({
             $scopedInstall = {
                 . $scriptPath\PrepCommandInstaller.ps1 $false
             }
+
+            Remove-Item "$playniteRoot\Extensions\PlayNiteWatcherExt" -Force  -Recurse
         
             & $scopedInstall
             [System.Windows.Forms.MessageBox]::Show("You can now close this application, the script has been successfully uninstalled", "Uninstall Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
