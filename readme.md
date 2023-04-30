@@ -1,15 +1,15 @@
-# PlayNite Watcher Script
+## PlayNite Watcher Script Installation Instructions
 
-The PlayNite Watcher Script is a script that helps to end the Sunshine stream automatically when a specified PlayNite Launched game is closed.
-It is intended to be used in conjunction with the Sunshine App Export extension which can be found on the [Playnite Add-ons page](https://playnite.link/addons.html). 
+1. Open the PlayNite program on your computer.
+2. Go to the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension.
+3. Find the "apps.json" file used on Sunshine. This is normally located in the config folder where Sunshine is installed, I.E C:\Program Files\Sunshine\config
+4. Copy the "apps.json" file to a different location on your computer, such as your desktop. (It needs to be in an area that does not require admin rights)
+5. Open PlayNite and select the games that you want to add to Sunshine.
+6. Click on the "Controller" menu button in the top left corner of the PlayNite window, then go to "Extensions" -> "Sunshine App Export" -> "Export selected games".
+7. Choose the copy of the "apps.json" file that you copied earlier when prompted. 
+8. Copy and paste the modified "apps.json" file back to its original location on your computer. You may be prompted for administrator rights during this step.
+9. Double-click on the "Installer.bat" file. This will open up a window with a list of the games you selected in Step 5.
+10. Check the box next to each game that you want to install the PlayNite Watcher Script on.
+11. Click the "Install" button when you're done.
 
-## Installation Instructions
-
-1. Install the Sunshine App Export extension in PlayNite. You can do this by going to the [Playnite Add-ons page](https://playnite.link/addons.html) and searching for the "Sunshine App Export", then clicking "Download".
-2. In PlayNite, select the applications that you wish to have added to Sunshine (if not added already), then click on the "Controller" menu button in the top left and go to "Extensions" -> "Sunshine App Export" -> "Export selected games".
-3. In the PlayNite installation directory, copy the "PlayNiteWatcherExt" folder to the Extensions folder.
-4. Double click on the "Install.bat" file to open up a UI form that allows you to select which games you want to install the script on.
-5. Checkmark each game you would like to have Sunshine end the stream on when it is closed.
-6. Once you have finished selecting the games, click on the "Install" button.
-
-Please note that this script is an early version and may contain bugs that will be fixed as they are discovered.
+**NOTE** You might be clever and try to simply add user permissions to apps.json as a workaround instead of copying, but please make sure to remove user write permission when done. If you fail to do this, you will allow Sunshine to be exposed to **CRITICAL** security vulnerabilities, such as elevation of privilege. These are the worst kind of security vulnerabilities, since Sunshine runs as SYSTEM level.
