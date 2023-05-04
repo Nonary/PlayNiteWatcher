@@ -58,10 +58,9 @@ try {
         }
 
         if ($null -eq $gamePath -and $streamStartJob.State -eq "Completed") {
-            Write-Host "Stream started event recieved, now saving game path to file for retrieval later"
             [string]$gamePath = $streamStartJob | Receive-Job
+            Write-Host "Received GamePath: $gamePath"
             $streamStartJob | Remove-Job
-            Set-Content -Path $path\currentGamePath.txt -Value $gamePath
         }
     }
 }

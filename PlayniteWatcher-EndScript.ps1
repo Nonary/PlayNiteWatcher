@@ -22,7 +22,8 @@ function TerminatePipe {
 
 
 function CloseLaunchedGame() {
-    $gamePath = Get-Content -Path "$path/currentGamePath.txt"
+    [string](Get-Content -Path "$path\log.txt") -match "(?<=Received GamePath:\s)(?<path>.*)"
+    [string]$gamePath = $matches['path']
     Write-Host $gamePath
     $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
     Write-Host $executables
