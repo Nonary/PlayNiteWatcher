@@ -80,7 +80,7 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
         </DockPanel>
         <DockPanel Grid.Row="1" Margin="10">
             <Label Content="Playnite Executable Location:" VerticalAlignment="Center" Width="165"/>
-            <TextBox Name="PlaynitePath" Text="C:\Program Files\Playnite\PlayniteDesktop.exe" Margin="5,0,5,0" Width="325" Height="25"/>
+            <TextBox Name="PlaynitePath" Text="C:\Program Files\Playnite\Playnite.DesktopApp.exe" Margin="5,0,5,0" Width="325" Height="25"/>
             <Button Name="PlayniteBrowseButton" Content="Browse" Width="75" HorizontalAlignment="Left" Margin="5,0,5,0" Height="25"/>
         </DockPanel>
         <GroupBox Grid.Row="2" Header="PlayNite Games" Margin="10">
@@ -133,9 +133,26 @@ $window.FindName("ExitButton").Add_Click({
 
 $window.FindName("InstallButton").Add_Click({
 
-        $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
+
+        ## Replace the $playNitePath with the users selection
         $playnitePath = $playNitePathTextBox.Text
         $playniteRoot = Split-Path $playnitePath -Parent
+
+        $filePath = ".\PlayniteWatcher.ps1" 
+    
+        $content = Get-Content -Path $filePath
+    
+        $pattern = '(\$playNitePath\s*=\s*")[^"]*(")'
+    
+        $updatedContent = $content -replace $pattern, "`$1$($playnitePath.Replace('\', '\\'))`$2"
+    
+        Set-Content -Path $filePath -Value $updatedContent
+        ######
+    
+
+
+        $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
+
         $updatedApps = $JsonContent.apps.Clone()
 
         foreach ($checkBox in $gameList.Children) {
@@ -161,7 +178,7 @@ $window.FindName("InstallButton").Add_Click({
         }
     
         & $scopedInstall
-        [System.Windows.Forms.MessageBox]::Show("You can now close this application, the script has been successfully installed to the selected applications", "Installation Complete!",[System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+        [System.Windows.Forms.MessageBox]::Show("You can now close this application, the script has been successfully installed to the selected applications", "Installation Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
 
     })
     
@@ -222,7 +239,7 @@ $window.Add_Loaded({
             }
         }
         catch {
-            [System.Windows.Forms.MessageBox]::Show("Could not retrieve PlayNite executable path, please navigate to the PlayNiteDesktop.exe file", "Error: Could not find PlayNite",[System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            [System.Windows.Forms.MessageBox]::Show("Could not retrieve PlayNite executable path, please navigate to the PlayNiteDesktop.exe file", "Error: Could not find PlayNite", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
             ShowOpenFileDialog -filter "Exe files (*.exe)|*.exe|All files (*.*)|*.*" -textBox $playNitePathTextBox
         }
     })

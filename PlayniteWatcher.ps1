@@ -2,6 +2,7 @@ param($playNiteId)
 
 $gamePath = $null
 $path = Split-Path $MyInvocation.MyCommand.Path -Parent
+$playNitePath = "C:\\Program Files\\Playnite\\Playnite.DesktopApp.exe"
 
 Start-Transcript $path\log.txt
 
@@ -42,7 +43,7 @@ try {
     }
 
 
-    Start-Process "F:\\Software\\Playnite\\Playnite.DesktopApp.exe" -ArgumentList "--start $playNiteId"
+    Start-Process -FilePath $playNitePath  -ArgumentList "--start $playNiteId"
 
     while ($true) {
         Start-Sleep -Seconds 1
