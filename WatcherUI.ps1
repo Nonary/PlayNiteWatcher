@@ -1,9 +1,18 @@
 $isAdmin = [bool]([System.Security.Principal.WindowsIdentity]::GetCurrent().groups -match 'S-1-5-32-544')
+Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName System.Windows.Forms
+
 
 # If the current user is not an administrator, re-launch the script with elevated privileges
 if (-not $isAdmin) {
-    Start-Process powershell.exe  -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`"" -WindowStyle Hidden
-    exit
+    $result = [System.Windows.Forms.MessageBox]::Show("You will be prompted for administrator rights, as Sunshine requires admin in order to modify the apps.json file.", "Administrator Required", [System.Windows.Forms.MessageBoxButtons]::OKCancel, [System.Windows.Forms.MessageBoxIcon]::Information)
+    if ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        exit
+    }
+    else {
+        Start-Process powershell.exe  -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`"" -WindowStyle Hidden
+        exit
+    }
 }
 
 $scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -227,7 +236,7 @@ $window.Add_Loaded({
             LoadGames -configPath $configPathTextBox.Text
         }
         catch {
-            [System.Windows.Forms.MessageBox]::Show("Could not load the Sunshine application list, please navigate to the app.json file", "Error: Could not find apps.json", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            [System.Windows.Forms.MessageBox]::Show("An issue was encountered while attempting to retrieve your Sunshine application list. Once you dismiss this message, a window will open, prompting you to locate the Sunshine config folder. Please ensure that navigate to your Sunshine config folder and select the `"apps.json`" file within it.", "Error: Could not find apps.json file", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
             ShowOpenFileDialog -filter "JSON files (*.json)|*.json|All files (*.*)|*.*" -textBox $configPathTextBox
             LoadGames -configPath $configPathTextBox.Text
         }
@@ -239,7 +248,7 @@ $window.Add_Loaded({
             }
         }
         catch {
-            [System.Windows.Forms.MessageBox]::Show("Could not retrieve PlayNite executable path, please navigate to the PlayNiteDesktop.exe file", "Error: Could not find PlayNite", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+            [System.Windows.Forms.MessageBox]::Show("An issue was encountered while attempting to retrieve the PlayNite executable path. Once you dismiss this message, a window will open, prompting you to locate the PlayNite folder. Please ensure that you choose the PlayNite folder and select the `"PlayNiteDesktop.exe`" file within it.", "Error: Could not find PlayNite Executable", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
             ShowOpenFileDialog -filter "Exe files (*.exe)|*.exe|All files (*.*)|*.*" -textBox $playNitePathTextBox
         }
     })

@@ -1,1 +1,1 @@
-powershell.exe -executionpolicy bypass -file ./WatcherUI.ps1
+powershell.exe -windowstyle hidden -executionpolicy bypass -file ./WatcherUI.ps1

@@ -2,7 +2,7 @@ param($playNiteId)
 
 $gamePath = $null
 $path = Split-Path $MyInvocation.MyCommand.Path -Parent
-$playNitePath = "C:\\Program Files\\Playnite\\Playnite.DesktopApp.exe"
+$playNitePath = "F:\\Software\\Playnite\\Playnite.DesktopApp.exe"
 
 Start-Transcript $path\log.txt
 
