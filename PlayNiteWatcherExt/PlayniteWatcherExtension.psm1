@@ -36,7 +36,19 @@ function OnGameStarting() {
 function OnGameStarted() {
     param($evnArgs)
     $game = $evnArgs.Game
-    Send-PipeMessage -pipeName "PlayniteWatcher-OnStreamStart" -message $game.InstallDirectory
+    $gamePath = $game.InstallDirectory
+
+    # Check to see if the game is emulated.
+    if($null -ne $game.GameActions){
+        $emulatorAction = $game.GameActions | Where-Object {$_.Type -eq "Emulator"} | Select-Object -First 1 -ErrorAction SilentlyContinue
+        if($null -ne $emulatorAction){
+            $emulatorId = $emulatorAction.EmulatorId.Guid
+            $emulator = $PlayniteAPI.Database.Emulators | Where-Object {$_.Id -eq $emulatorId}
+            $gamePath = $emulator.InstallDir
+        }
+    }
+
+    Send-PipeMessage -pipeName "PlayniteWatcher-OnStreamStart" -message $gamePath
 }
 
 function OnGameStopped() {
