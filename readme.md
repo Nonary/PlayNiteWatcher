@@ -9,6 +9,8 @@ The purpose of this script is to use PlayNite to allow most games to work in the
 
 ## Caveats
 
+## This script only works on Sunshine 0.20.x and above.
+
 1. If you're using Windows 11, make sure your Default Terminal setting is set to Windows Console Host. Windows Terminal has a bug that prevents hidden windows in PowerShell.
 2. Installing this script will temporarily close Sunshine to apply changes, so be prepared for a disconnect if you're using Moonlight during the script installation.
 
@@ -20,6 +22,7 @@ Before starting, make sure you meet these requirements:
 - Sunshine must be installed as a service (the zip version of Sunshine won't work with this script).
 - Set Sunshine's logging level to Debug.
 - Users must have read permissions to `%WINDIR%/Temp/Sunshine.log` (do not change other permissions, just ensure Users have at least read permissions).
+- Sunshine is at least 0.20 or higher.
 
 ## Setup
 
@@ -45,5 +48,6 @@ If you encounter any issues while using the PlayNite Watcher script, try these s
 1. Make sure you've followed all the setup steps correctly.
 2. Verify you have the proper prerequisites installed and configured.
 3. Ensure you have read permissions for `%WINDIR%/Temp/Sunshine.log`.
+4. Verify Sunshine is at 0.20 or higher.
 
 If you still experience issues after following these troubleshooting steps, please consider posting your issue on either the Sunshine or Moonlight discord. The author of this script is DemonCat.
