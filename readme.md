@@ -28,18 +28,17 @@ Before starting, make sure you meet these requirements:
 
 Follow these steps to set up the PlayNite Watcher script:
 
-1. Open the PlayNite program on your computer.
-2. Visit the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension.
-3. Locate the "apps.json" file used by Sunshine. It's usually found in the config folder where Sunshine is installed, like C:\Program Files\Sunshine\config
-4. Make a copy of the "apps.json" file and place it in a different location on your computer, such as your desktop. (Choose an area that does not require admin rights)
-5. Open PlayNite and select the games you want to add to Sunshine.
-6. Click the "Controller" menu button in the top left corner of the PlayNite window, then go to "Extensions" -> "Sunshine App Export" -> "Export selected games".
-7. When prompted, select the copy of the "apps.json" file you made in step 4. 
-8. Move the modified "apps.json" file back to its original location on your computer. You may be prompted for administrator rights during this step.
-9. Double-click on the "Installer.bat" file. Click OK on the administrator prompt dialog. A window will open, showing the list of games you selected in step 5.
-10. If you see an error message about the program being unable to retrieve configuration, follow the instructions in the error message to fix the issue.
-11. Check the box next to each game you want to install the PlayNite Watcher Script on. Alternatively, click the Check All button to select all PlayNite games added to Sunshine.
-12. Click the "Install" button when you're ready.
+1. Open the PlayNite program on your computer **as an administrator** (important!).
+2. Dismiss the warning about administrator rights on PlayNite, we need administrator rights for the next steps.
+3. Visit the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension.
+4. In PlayNite, elect the games you want to add to Sunshine.
+5. Click the "Controller" menu button in the top left corner of the PlayNite window, then go to "Extensions" -> "Sunshine App Export" -> "Export selected games".
+6. If you've changed the install path of Sunshine, type out the correct path, otherwise just click OK to finalize the export.
+7. Double-click on the "Installer.bat" file. Click OK on the administrator prompt dialog. A window will open, showing the list of games you selected in step 5.
+8. If you see an error message about the program being unable to retrieve configuration, follow the instructions in the error message to fix the issue.
+9. Check the box next to each game you want to install the PlayNite Watcher Script on. Alternatively, click the Check All button to select all PlayNite games added to Sunshine.
+10. Click the "Install" button when you're ready.
+11. Close PlayNite and re-open it, since we no longer need administrator rights from this point on.
 
 ## Troubleshooting
 
