@@ -24,7 +24,7 @@ Add-Type -AssemblyName System.Windows.Forms
 function LoadPlayniteExecutablePath($apps) { 
     foreach ($app in $apps) { 
         if ($app.PSObject.Properties.Name -contains 'detached') { 
-            $match = select-string -InputObject $app.detached -Pattern '^(?<path>.+)\\Playnite.DesktopApp.exe' 
+            $match = select-string -InputObject $app.detached -Pattern '(?<path>[^"]+)\\Playnite.DesktopApp.exe' 
             if ($match) { 
                 $playNitePathTextBox.Text = $match.Matches.Groups[0].Value 
                 return $playNitePathTextBox.Text
@@ -213,7 +213,7 @@ $window.FindName("UninstallButton").Add_Click({
     
     
                 $app.PSObject.Properties.Remove('cmd')
-                $app | Add-Member -MemberType NoteProperty -Name "detached" -Value @("$playnitePath --start $id") -Force
+                $app | Add-Member -MemberType NoteProperty -Name "detached" -Value @("`"$playnitePath`" --start $id") -Force
                 
             }
     
