@@ -22,23 +22,24 @@ function TerminatePipe {
 
 
 function CloseLaunchedGame() {
-    [string](Get-Content -Path "$path\log.txt") -match "(?<=Received GamePath:\s)(?<path>\S*)"
-    [string]$gamePath = $matches['path']
-    Write-Host $gamePath
-    $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
-    Write-Host $executables
+    if ([string](Get-Content -Path "$path\log.txt") -match "(?<=Received GamePath:\s)(?<path>\S*)") {
+        [string]$gamePath = $matches['path']
+        Write-Host $gamePath
+        $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
+        Write-Host $executables
 
-    foreach ($executable in $executables) {
-        $process = Get-Process -Name $executable.Name.Split('.')[0] -ErrorAction SilentlyContinue
-        if ($null -ne $process) {
-            Write-Host "Stopping the following processes, since it is still open and Sunshine stream has ended: $($process.Name)"
-            $process | Stop-Process
+        foreach ($executable in $executables) {
+            $process = Get-Process -Name $executable.Name.Split('.')[0] -ErrorAction SilentlyContinue
+            if ($null -ne $process) {
+                Write-Host "Stopping the following processes, since it is still open and Sunshine stream has ended: $($process.Name)"
+                $process | Stop-Process
+            }
         }
     }
 }
 
-function CloseDesktopGracefully(){
-    if([string](Get-Content -Path "$path\log.txt") -match "(?<=Launching Desktop:\s)(?<path>\S*)"){
+function CloseDesktopGracefully() {
+    if ([string](Get-Content -Path "$path\log.txt") -match "(?<=Launching Desktop:\s)(?<path>\S*)") {
         $desktopPath = $matches['path']
         Start-Process $desktopPath -ArgumentList "--shutdown"
     }

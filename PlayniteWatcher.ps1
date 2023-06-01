@@ -4,6 +4,8 @@ $gamePath = $null
 $path = Split-Path $MyInvocation.MyCommand.Path -Parent
 $playNitePath = "F:\\Software\\Playnite\\Playnite.DesktopApp.exe"
 $fullScreenPath = "$(Split-Path $playNitePath -Parent)\\Playnite.FullscreenApp.exe"
+$monitorDesktop = $false
+
 
 Start-Transcript $path\log.txt
 
@@ -47,8 +49,14 @@ try {
         Start-Process -FilePath $playNitePath  -ArgumentList "--start $playNiteId"
     }
     else {
+        $elapsedSeconds = 0
         Write-Host "Launching Desktop: $fullScreenPath"
+        $monitorDesktop = $true
         Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList $fullScreenPath | Out-Null
+        while($elapsedSeconds -lt 5.0 -and ($null -eq (Get-Process Playnite.FullscreenApp -ErrorAction SilentlyContinue))){
+            Start-Sleep -Milliseconds 500
+            $elapsedSeconds += .5
+        }
     }
 
     while ($true) {
@@ -69,6 +77,15 @@ try {
             Write-Host "Received GamePath: $gamePath"
             $streamStartJob | Remove-Job
         }
+
+        if($monitorDesktop){
+            if($null -eq (Get-Process Playnite.FullscreenApp -ErrorAction SilentlyContinue)){
+                Write-Host "Playnite Fullscreen ended, terminating script."
+                break;
+            }
+        }
+
+        $elapsedSeconds += 1
     }
 }
 finally {
