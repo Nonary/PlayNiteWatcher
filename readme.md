@@ -1,18 +1,22 @@
 # PlayNite Watcher Script
 
-Welcome to the PlayNite Watcher script for Sunshine and Moonlight! This script helps you add multiple games to Sunshine, and automatically closes Moonlight when the games are closed. It also allows you to end the stream and have it close automatically on your computer. This script creates an experience similar to GeForce Experience with its limited 300 supported games. Once the installation is done, you'll see game names, box art, and other details in Moonlight.
+Welcome to the PlayNite Watcher script for Sunshine and Moonlight! This script helps you add multiple games to Sunshine, and automatically closes Moonlight when the games are closed. It also allows you to end the stream and have it close automatically on your computer. This script creates an experience similar to GeForce Experience with its limited 300 supported games. Once the installation is done, you'll see game names, box art, and other details in Moonlight. You can also optionally choose to use PlayNite as a "Big Picture Mode" replacement, and it will still support closing out active games and ending sessions once finished.
 
 # Why a script is needed
 A lot of games launch with their own launchers, and do not work without being added as a "detached" command. Unfortunately, when doing this... it prevents Sunshine and Moonlight from being able to tell if the game has closed to end the stream automatically.
 
 The purpose of this script is to use PlayNite to allow most games to work in the way you'd expect them to work by converting them into "commands" which can be watched by Sunshine.
 
-## Caveats
-
-## This script only works on Sunshine 0.20.x and above.
-
-1. If you're using Windows 11, make sure your Default Terminal setting is set to Windows Console Host. Windows Terminal has a bug that prevents hidden windows in PowerShell.
-2. Installing this script will temporarily close Sunshine to apply changes, so be prepared for a disconnect if you're using Moonlight during the script installation.
+## Caveats:
+ - This script only works with Sunshine 0.20.x or above.
+ - If using Windows 11, you'll need to set the default terminal to Windows Console Host as there is currently a bug in Windows Terminal that prevents hidden consoles from working properly.
+    * That can be changed at Settings > Privacy & security > Security > For developers > Terminal [Let Windows decide] >> (change to) >> Terminal [Windows Console Host]
+ - Prepcommands do not work from cold reboots, and will prevent Sunshine from working until you logon locally.
+   * You should add a new application (with any name you'd like) in the WebUI and leave **both** the command and detached command empty.
+   * When adding this new application, make sure global prep command option is disabled.
+   * That will serve as a fallback option when you have to remote into your computer from a cold start.
+   * Normal reboots issued from start menu, will still work without the workaround above as long as Settings > Accounts > Sign-in options and "Use my sign-in info to automatically finish setting up after an update" is enabled which is default in Windows 10 & 11.
+ - The script will stop working if you move the folder, simply reinstall it to resolve that issue.
 
 ## Prerequisites
 
@@ -26,7 +30,7 @@ Before starting, make sure you meet these requirements:
 
 ## Setup
 
-Follow these steps to set up the PlayNite Watcher script:
+If you prefer to add applications individually to Moonlight, follow these steps to set up the PlayNite Watcher script:
 
 1. Open the PlayNite program on your computer **as an administrator** (important!).
 2. Dismiss the warning about administrator rights on PlayNite, we need administrator rights for the next steps.
@@ -39,6 +43,15 @@ Follow these steps to set up the PlayNite Watcher script:
 9. Check the box next to each game you want to install the PlayNite Watcher Script on. Alternatively, click the Check All button to select all PlayNite games added to Sunshine.
 10. Click the "Install" button when you're ready.
 11. Close PlayNite and re-open it, since we no longer need administrator rights from this point on.
+
+If you prefer to utilize the "Big Picture Mode" or Full Screen view of PlayNite instead:
+
+1. Double-click on the "Installer.bat" file. Click OK on the administrator prompt dialog. A UI interface will open showing your PlayNite games that you have exported (if applicable).
+2. If you see an error message about the program being unable to retrieve configuration, follow the instructions in the error message to fix the issue.
+3. Enable the PlayNite FullScreen Desktop under the "PlayNite Games" section.
+4. Click the "Install" button when you're ready.
+
+Tip: This script supports both methods, you can have the desktop and individual apps without issues.
 
 ## Troubleshooting
 

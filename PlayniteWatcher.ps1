@@ -3,6 +3,7 @@ param($playNiteId)
 $gamePath = $null
 $path = Split-Path $MyInvocation.MyCommand.Path -Parent
 $playNitePath = "F:\\Software\\Playnite\\Playnite.DesktopApp.exe"
+$fullScreenPath = "$(Split-Path $playNitePath -Parent)\\Playnite.FullscreenApp.exe"
 
 Start-Transcript $path\log.txt
 
@@ -42,8 +43,13 @@ try {
         $streamReader.Dispose()
     }
 
-
-    Start-Process -FilePath $playNitePath  -ArgumentList "--start $playNiteId"
+    if ($playNiteId -ne "Desktop") {
+        Start-Process -FilePath $playNitePath  -ArgumentList "--start $playNiteId"
+    }
+    else {
+        Write-Host "Launching Desktop: $fullScreenPath"
+        Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList $fullScreenPath | Out-Null
+    }
 
     while ($true) {
         Start-Sleep -Seconds 1

@@ -22,7 +22,7 @@ function TerminatePipe {
 
 
 function CloseLaunchedGame() {
-    [string](Get-Content -Path "$path\log.txt") -match "(?<=Received GamePath:\s)(?<path>.*)"
+    [string](Get-Content -Path "$path\log.txt") -match "(?<=Received GamePath:\s)(?<path>\S*)"
     [string]$gamePath = $matches['path']
     Write-Host $gamePath
     $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
@@ -37,5 +37,13 @@ function CloseLaunchedGame() {
     }
 }
 
+function CloseDesktopGracefully(){
+    if([string](Get-Content -Path "$path\log.txt") -match "(?<=Launching Desktop:\s)(?<path>\S*)"){
+        $desktopPath = $matches['path']
+        Start-Process $desktopPath -ArgumentList "--shutdown"
+    }
+}
+
 TerminatePipe
 CloseLaunchedGame
+CloseDesktopGracefully

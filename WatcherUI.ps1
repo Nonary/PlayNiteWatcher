@@ -43,11 +43,17 @@ function LoadGames($configPath) {
     $JsonContent = Get-Content -Path $configPath -Raw | ConvertFrom-Json
 
     # Filter games with PlayNite commands
-    $PlayNiteGames = $JsonContent.apps | Where-Object { $_.detached -match 'PlayNite' -or $_.cmd -match 'PlayNite' }
+    $PlayNiteGames = $JsonContent.apps | Where-Object { ($_.detached -match 'PlayNite' -or $_.cmd -match 'PlayNite') -and ($_.name -ne "PlayNite FullScreen Desktop") }
     $script:sunshineApps = $PlayNiteGames
 
     # Clear the current list
     $gameList.Children.Clear()
+    $checkBox = New-Object System.Windows.Controls.CheckBox
+    $checkBox.Content = "PlayNite FullScreen Desktop"
+    $checkBox.IsChecked = $null -ne ($JsonContent.apps | Where-Object {$_.name -eq 'Playnite FullScreen Desktop'})
+
+    # Add the PlayNite Desktop Option
+    $gameList.Children.Add($checkBox)
 
     # Add games to the UI
     foreach ($game in $PlayNiteGames) {
@@ -165,12 +171,29 @@ $window.FindName("InstallButton").Add_Click({
         $updatedApps = $JsonContent.apps.Clone()
 
         foreach ($checkBox in $gameList.Children) {
+            
             $appName = $checkBox.Content
             $app = $updatedApps | Where-Object { $_.name -eq $appName }
             $app.'image-path' -match 'Apps\\(.*)\\'
             $id = $Matches[1]
 
+            if($appName -eq "PlayNite FullScreen Desktop"){
+                if($checkBox.IsChecked){
+                    $updatedApps += [PSCustomObject]@{
+                        name = "PlayNite FullScreen Desktop"
+                        'image-path' = "$scriptPath\playnite-boxart.png"
+                        cmd = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" Desktop"
+                    }
+                }
+                else {
+                    $updatedApps = $updatedApps | Where-Object {$_.name -ne 'PlayNite FullScreen Desktop'}
+                }
+
+                continue;
+            }
+
             if ($checkBox.IsChecked) {
+
                 $app.PSObject.Properties.Remove('detached')
                 $app | Add-Member -MemberType NoteProperty -Name "cmd" -Value "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" $id" -Force
             }
@@ -203,7 +226,7 @@ $window.FindName("UninstallButton").Add_Click({
             $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
             $playnitePath = $playNitePathTextBox.Text
             $playniteRoot = Split-Path $playnitePath -Parent
-            $updatedApps = $JsonContent.apps.Clone()
+            $updatedApps = $JsonContent.apps.Clone() | Where-Object {$_.name -ne "Playnite FullScreen Desktop"}
     
             foreach ($checkBox in $gameList.Children) {
                 $appName = $checkBox.Content
