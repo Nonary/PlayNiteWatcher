@@ -43,14 +43,14 @@ function LoadGames($configPath) {
     $JsonContent = Get-Content -Path $configPath -Raw | ConvertFrom-Json
 
     # Filter games with PlayNite commands
-    $PlayNiteGames = $JsonContent.apps | Where-Object { ($_.detached -match 'PlayNite' -or $_.cmd -match 'PlayNite') -and ($_.name -ne "PlayNite FullScreen Desktop") }
+    $PlayNiteGames = $JsonContent.apps | Where-Object { ($_.detached -match 'PlayNite' -or $_.cmd -match 'PlayNite') -and ($_.name -ne "PlayNite FullScreen App") }
     $script:sunshineApps = $PlayNiteGames
 
     # Clear the current list
     $gameList.Children.Clear()
     $checkBox = New-Object System.Windows.Controls.CheckBox
-    $checkBox.Content = "PlayNite FullScreen Desktop"
-    $checkBox.IsChecked = $null -ne ($JsonContent.apps | Where-Object {$_.name -eq 'Playnite FullScreen Desktop'})
+    $checkBox.Content = "PlayNite FullScreen App"
+    $checkBox.IsChecked = $null -ne ($JsonContent.apps | Where-Object {$_.name -eq 'PlayNite FullScreen App'})
 
     # Add the PlayNite Desktop Option
     $gameList.Children.Add($checkBox)
@@ -177,16 +177,19 @@ $window.FindName("InstallButton").Add_Click({
             $app.'image-path' -match 'Apps\\(.*)\\'
             $id = $Matches[1]
 
-            if($appName -eq "PlayNite FullScreen Desktop"){
+            if($appName -eq "PlayNite FullScreen App"){
                 if($checkBox.IsChecked){
-                    $updatedApps += [PSCustomObject]@{
-                        name = "PlayNite FullScreen Desktop"
-                        'image-path' = "$scriptPath\playnite-boxart.png"
-                        cmd = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" Desktop"
+                    # Prevent adding the fullscreen applet twice.
+                    if($null -eq ($updatedApps | Where-Object {$_.name -eq $appName})){
+                        $updatedApps += [PSCustomObject]@{
+                            name = "PlayNite FullScreen App"
+                            'image-path' = "$scriptPath\playnite-boxart.png"
+                            cmd = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
+                        }
                     }
                 }
                 else {
-                    $updatedApps = $updatedApps | Where-Object {$_.name -ne 'PlayNite FullScreen Desktop'}
+                    $updatedApps = $updatedApps | Where-Object {$_.name -ne 'PlayNite FullScreen App'}
                 }
 
                 continue;
@@ -226,7 +229,7 @@ $window.FindName("UninstallButton").Add_Click({
             $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
             $playnitePath = $playNitePathTextBox.Text
             $playniteRoot = Split-Path $playnitePath -Parent
-            $updatedApps = $JsonContent.apps.Clone() | Where-Object {$_.name -ne "Playnite FullScreen Desktop"}
+            $updatedApps = $JsonContent.apps.Clone() | Where-Object {$_.name -ne "PlayNite FullScreen App"}
     
             foreach ($checkBox in $gameList.Children) {
                 $appName = $checkBox.Content
@@ -272,7 +275,7 @@ $window.Add_Loaded({
         }
         catch {
             [System.Windows.Forms.MessageBox]::Show("An issue was encountered while attempting to retrieve the PlayNite executable path. Once you dismiss this message, a window will open, prompting you to locate the PlayNite folder. Please ensure that you choose the PlayNite folder and select the `"PlayNiteDesktop.exe`" file within it.", "Error: Could not find PlayNite Executable", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-            ShowOpenFileDialog -filter "Exe files (*.exe)|*.exe|All files (*.*)|*.*" -textBox $playNitePathTextBox
+            ShowOpenFileDialog -filter "Playnite Exe|Playnite.DesktopApp.exe|All files (*.*)|*.*" -textBox $playNitePathTextBox
         }
     })
 

@@ -45,12 +45,12 @@ try {
         $streamReader.Dispose()
     }
 
-    if ($playNiteId -ne "Desktop") {
+    if ($playNiteId -ne "FullScreen") {
         Start-Process -FilePath $playNitePath  -ArgumentList "--start $playNiteId"
     }
     else {
         $elapsedSeconds = 0
-        Write-Host "Launching Desktop: $fullScreenPath"
+        Write-Host "Launching PlayNite Fullscreen: $fullScreenPath"
         $monitorDesktop = $true
         Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList $fullScreenPath | Out-Null
         while($elapsedSeconds -lt 5.0 -and ($null -eq (Get-Process Playnite.FullscreenApp -ErrorAction SilentlyContinue))){
