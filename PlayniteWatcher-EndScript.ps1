@@ -22,8 +22,9 @@ function TerminatePipe {
 
 
 function CloseLaunchedGame() {
-    if ([string](Get-Content -Path "$path\log.txt") -match "(?<=Received GamePath:\s)(?<path>\S*)") {
-        [string]$gamePath = $matches['path']
+    $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Received GamePath:\s)(?<path>.*)"
+    if ($null -ne $matchesFound) {
+        [string]$gamePath = $matchesFound.Matches[0].Value
         Write-Host $gamePath
         $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
         Write-Host $executables
@@ -39,8 +40,9 @@ function CloseLaunchedGame() {
 }
 
 function CloseDesktopGracefully() {
-    if ([string](Get-Content -Path "$path\log.txt") -match "(?<=Launching PlayNite Fullscreen:\s)(?<path>\S*)") {
-        $desktopPath = $matches['path']
+    $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Launching PlayNite Fullscreen:\s)(?<path>.*)"
+    if ($null -ne $matchesFound) {
+        $desktopPath = $matchesFound.Matches[0].Value
         Start-Process $desktopPath -ArgumentList "--shutdown"
     }
 }
