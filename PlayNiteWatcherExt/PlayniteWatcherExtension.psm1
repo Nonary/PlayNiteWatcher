@@ -53,7 +53,13 @@ function OnGameStarted() {
 
 function OnGameStopped() {
     param($evnArgs)
-    Send-PipeMessage -pipeName "PlayniteWatcher" -message "Terminate"
+
+    $mode = $PlayniteApi.ApplicationInfo.Mode
+    $isFullscreen = $mode -eq [Playnite.SDK.ApplicationMode]::Fullscreen
+
+    if (!$isFullscreen) {
+        Send-PipeMessage -pipeName "PlayniteWatcher" -message "Terminate"
+    }
 }
 
 function OnGameInstalled() {
