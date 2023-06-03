@@ -1,9 +1,14 @@
 function Send-PipeMessage($pipeName, $message) {
     $pipeExists = Get-ChildItem -Path "\\.\pipe\" | Where-Object { $_.Name -eq $pipeName } 
     if ($pipeExists.Length -gt 0) {
+        $__logger.Info("Named pipe currently exists, attempting to send communication")
         $pipe = New-Object System.IO.Pipes.NamedPipeClientStream(".", $pipeName, [System.IO.Pipes.PipeDirection]::Out)
+        $__logger.Info("Connecting to pipe...")
+
         $pipe.Connect()
         $streamWriter = New-Object System.IO.StreamWriter($pipe)
+        $__logger.Info("Sending message to pipe: $message...")
+
         $streamWriter.WriteLine($message)
         try {
             $streamWriter.Flush()
@@ -14,6 +19,7 @@ function Send-PipeMessage($pipeName, $message) {
             # We don't care if the disposal fails, this is common with async pipes.
             # Also, this powershell script will terminate anyway.
         }
+        $__logger.Info("Communication completed!")
     }
 }
 function OnApplicationStarted() {
@@ -39,11 +45,11 @@ function OnGameStarted() {
     $gamePath = $game.InstallDirectory
 
     # Check to see if the game is emulated.
-    if($null -ne $game.GameActions){
-        $emulatorAction = $game.GameActions | Where-Object {$_.Type -eq "Emulator"} | Select-Object -First 1 -ErrorAction SilentlyContinue
-        if($null -ne $emulatorAction){
+    if ($null -ne $game.GameActions) {
+        $emulatorAction = $game.GameActions | Where-Object { $_.Type -eq "Emulator" } | Select-Object -First 1 -ErrorAction SilentlyContinue
+        if ($null -ne $emulatorAction) {
             $emulatorId = $emulatorAction.EmulatorId.Guid
-            $emulator = $PlayniteAPI.Database.Emulators | Where-Object {$_.Id -eq $emulatorId}
+            $emulator = $PlayniteAPI.Database.Emulators | Where-Object { $_.Id -eq $emulatorId }
             $gamePath = $emulator.InstallDir
         }
     }
@@ -53,7 +59,16 @@ function OnGameStarted() {
 
 function OnGameStopped() {
     param($evnArgs)
-    Send-PipeMessage -pipeName "PlayniteWatcher" -message "Terminate"
+    $__logger.Info("OnGameStopping $($evnArgs.Game)")
+
+    $mode = $PlayniteApi.ApplicationInfo.Mode
+    $isFullscreen = $mode -eq [Playnite.SDK.ApplicationMode]::Fullscreen
+    
+
+    if (-not $isFullscreen) {
+        $__logger.Info("Application is not in fullscreen, stopping playnite watcher!")
+        Send-PipeMessage -pipeName "PlayniteWatcher" -message "Terminate"
+    }
 }
 
 function OnGameInstalled() {
