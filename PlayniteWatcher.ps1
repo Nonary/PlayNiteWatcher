@@ -29,7 +29,7 @@ try {
     
             $message = $streamReader.ReadLine()
 
-            if($message -eq "Terminate"){
+            if ($message -eq "Terminate") {
                 break;
                 return;
             }
@@ -75,6 +75,35 @@ try {
             Start-Sleep -Milliseconds 500
             $elapsedSeconds += .5
         }
+
+        try {
+
+            Add-Type -TypeDefinition -ErrorAction SilentlyContinue @"
+using System;
+using System.Runtime.InteropServices;
+
+public class WindowHelper
+{
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+}
+"@
+
+            # Get the process ID (PID) of the application you want to bring to the foreground
+            $processID = Get-Process -Name "Playnite.FullscreenApp" | Select-Object -ExpandProperty ID
+
+            # Find the application's main window handle using the process ID
+            $mainWindowHandle = (Get-Process -id $processID).MainWindowHandle
+
+            # Bring the application to the foreground
+            [WindowHelper]::SetForegroundWindow($mainWindowHandle)
+        }
+        catch {
+            Write-Host "Failed to apply focus on FullScreen app, application such as DS4Tool may not properly activate controller profiles."
+            Write-Host "This is not a serious error, and does not prevent the overall functionality of the script"
+        }
+
     }
 
 
