@@ -49,6 +49,8 @@ function CloseLaunchedGame() {
 }
 
 function CloseDesktopGracefully() {
+    # Give Playnite enough time to save playtime statistics
+    Start-Sleep -Seconds 3 
     $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Launching PlayNite Fullscreen:\s)(?<path>.*)"
     if ($null -ne $matchesFound) {
         $desktopPath = $matchesFound.Matches[0].Value
