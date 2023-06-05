@@ -48,12 +48,6 @@ function LoadGames($configPath) {
 
     # Clear the current list
     $gameList.Children.Clear()
-    $checkBox = New-Object System.Windows.Controls.CheckBox
-    $checkBox.Content = "PlayNite FullScreen App"
-    $checkBox.IsChecked = $null -ne ($JsonContent.apps | Where-Object {$_.name -eq 'PlayNite FullScreen App'})
-
-    # Add the PlayNite Desktop Option
-    $gameList.Children.Add($checkBox)
 
     # Add games to the UI
     foreach ($game in $PlayNiteGames) {
@@ -170,30 +164,21 @@ $window.FindName("InstallButton").Add_Click({
 
         $updatedApps = $JsonContent.apps.Clone()
 
+        ## add FullScreen applet
+        if($null -eq ($updatedApps | Where-Object {$_.name -eq "PlayNite FullScreen App"})){
+            $updatedApps += [PSCustomObject]@{
+                name = "PlayNite FullScreen App"
+                'image-path' = "$scriptPath\playnite-boxart.png"
+                cmd = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
+            }
+        }
+
         foreach ($checkBox in $gameList.Children) {
             
             $appName = $checkBox.Content
             $app = $updatedApps | Where-Object { $_.name -eq $appName }
             $app.'image-path' -match 'Apps\\(.*)\\'
             $id = $Matches[1]
-
-            if($appName -eq "PlayNite FullScreen App"){
-                if($checkBox.IsChecked){
-                    # Prevent adding the fullscreen applet twice.
-                    if($null -eq ($updatedApps | Where-Object {$_.name -eq $appName})){
-                        $updatedApps += [PSCustomObject]@{
-                            name = "PlayNite FullScreen App"
-                            'image-path' = "$scriptPath\playnite-boxart.png"
-                            cmd = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
-                        }
-                    }
-                }
-                else {
-                    $updatedApps = $updatedApps | Where-Object {$_.name -ne 'PlayNite FullScreen App'}
-                }
-
-                continue;
-            }
 
             if ($checkBox.IsChecked) {
 
@@ -242,6 +227,9 @@ $window.FindName("UninstallButton").Add_Click({
                 $app | Add-Member -MemberType NoteProperty -Name "detached" -Value @("`"$playnitePath`" --start $id") -Force
                 
             }
+
+            # Remove FullScreen Applet
+            $updatedApps = $updatedApps | Where-Object {$_.name -ne 'PlayNite FullScreen App'}
     
             SaveChanges -configPath $configPathTextBox.Text -updatedApps $updatedApps -JsonContent $JsonContent
     
