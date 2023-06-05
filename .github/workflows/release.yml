@@ -27,7 +27,7 @@ jobs:
           const owner = context.repo.owner;
           const repo = context.repo.repo;
           
-          const releases = await github.repos.listReleases({
+          const releases = await github.rest.repos.listReleases({
             owner,
             repo,
           });
@@ -41,7 +41,7 @@ jobs:
           
           const body = fs.readFileSync('readme.md', 'utf8');
 
-          await github.repos.updateRelease({
+          await github.rest.repos.updateRelease({
             owner,
             repo,
             release_id: release.data.id,
