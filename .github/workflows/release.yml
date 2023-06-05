@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       tag: fullscreen
+    permissions: 
+      contents: write
     
     steps:
     - name: Checkout repo
