@@ -33,7 +33,6 @@ jobs:
 
           const release = releases.data.find((release) => release.tag_name === tag);
 
-          console.log(release.data);
 
           if(!release) {
             console.log(`Release with tag ${tag} not found`);
@@ -45,7 +44,7 @@ jobs:
           await github.rest.repos.updateRelease({
             owner,
             repo,
-            release_id: release.data.id,
+            release_id: release.id,
             body,
           });
     - name: Zip the repository
