@@ -51,9 +51,7 @@ jobs:
           });
     - name: Zip the repository
       run: |
-        mkdir PlayniteWatcher
-        mv . PlayniteWatcher
-        zip -r PlayniteWatcher.zip PlayniteWatcher
+        zip -r PlayniteWatcher.zip ${{github.workspace}}
 
     - name: Upload zip to the release
       uses: actions/upload-release-asset@v1
