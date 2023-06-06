@@ -2,7 +2,7 @@
 
 Welcome to the PlayNite Watcher script for Sunshine and Moonlight! This script helps you add multiple games to Sunshine, and automatically closes Moonlight when the games are closed. It also allows you to end the stream and have it close automatically on your computer. This script creates an experience similar to GeForce Experience with its limited 300 supported games. Once the installation is done, you'll see game names, box art, and other details in Moonlight. 
 
-If you prefer having a "Big Picture Mode" experience, or want to utilize the FullScreen mode of PlayNite this script also offers that capability as well, and will support terminating games and ending sunshine in the exact same manner as an individual application being added.
+If you prefer having a "Big Picture Mode" experience, or want to utilize the FullScreen mode of PlayNite this script also offers that capability as well, with the support of terminating any currently running game when you close the app from Moonlight.
 
 # Why a script is needed
 A lot of games launch with their own launchers, and do not work without being added as a "detached" command. Unfortunately, when doing this... it prevents Sunshine and Moonlight from being able to tell if the game has closed to end the stream automatically.
@@ -33,10 +33,8 @@ Before starting, make sure you meet these requirements:
 - Sunshine is at least 0.20 or higher.
 
 ## Setup
-You can use the FullScreen view of PlayNite and also add the applications individually. These are not mutally exclusive, and it is suggested to do both. You can prioritize adding your favorite games to Sunshine directly, and use the fullscreen option as a fallback for the less popular games.
 
-
-### If you prefer to add applications individually to Moonlight:
+Note: The script will add Playnite fullscreen mode to Sunshine automatically, so you don't have to add **every** game to Sunshine, focus on exporting your most popular ones. The fullscreen mode added is like Steams "Big Picture Mode" and can be used to launch games you have not added directly to Sunshine.
 
 1. Open the PlayNite program on your computer.
 2. Visit the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension, when prompted by the browser to open it in PlayNite, click Open.
@@ -47,17 +45,10 @@ You can use the FullScreen view of PlayNite and also add the applications indivi
 7. Double-click on the "Installer.bat" file. Click OK on the administrator prompt dialog. A window will open, showing the list of games you selected in step 5.
 8. If you see an error message about the program being unable to retrieve configuration, follow the instructions in the error message to fix the issue.
 9. Check the box next to each game you want to install the PlayNite Watcher Script on. Alternatively, click the Check All button to select all PlayNite games added to Sunshine.
-    - If you want to include the FullScreen app for PlayNite for a big picture mode experience, you can optionally choose to enable it here as well.
 10. Click the "Install" button when you're ready.
 
-### To add a "Big Picture Mode" or utilize the Full Screen view of PlayNite:
 
-1. Double-click on the "Installer.bat" file. Click OK on the administrator prompt dialog. A UI interface will open showing your PlayNite games that you have exported (if applicable).
-2. If you see an error message about the program being unable to retrieve configuration, follow the instructions in the error message to fix the issue.
-3. Enable the "PlayNite FullScreen App" under the "PlayNite Games" section.
-4. Click the "Install" button when you're ready.
-
-
+Installing the script will automatically add a Playnite application to Sunshine which will launch the fullscreen of Playnite, which can be used to launch your least popular games if you prefer not to add everything to Sunshine.
 
 ## Troubleshooting
 

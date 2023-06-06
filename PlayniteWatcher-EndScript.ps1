@@ -1,13 +1,15 @@
 $path = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 
-function TerminatePipe {
-    $pipeExists = Get-ChildItem -Path "\\.\pipe\" | Where-Object { $_.Name -eq "PlayniteWatcher" } 
+function Send-PipeMessage($pipeName, $message) {
+    $pipeExists = Get-ChildItem -Path "\\.\pipe\" | Where-Object { $_.Name -eq $pipeName } 
     if ($pipeExists.Length -gt 0) {
-        $pipeName = "PlayniteWatcher"
         $pipe = New-Object System.IO.Pipes.NamedPipeClientStream(".", $pipeName, [System.IO.Pipes.PipeDirection]::Out)
-        $pipe.Connect()
+
+        # Give up after 5 seconds, if we can't connect by then it's probably stalled.
+        $pipe.Connect(5)
         $streamWriter = New-Object System.IO.StreamWriter($pipe)
-        $streamWriter.WriteLine("Terminate")
+
+        $streamWriter.WriteLine($message)
         try {
             $streamWriter.Flush()
             $streamWriter.Dispose()
@@ -20,11 +22,16 @@ function TerminatePipe {
     }
 }
 
+function TerminatePipes {
+    Send-PipeMessage -pipeName "PlayniteWatcher-OnStreamStart" -message "Terminate"
+    Send-PipeMessage -pipeName "PlayniteWatcher" -message "Terminate"
+}
+
 
 function CloseLaunchedGame() {
     $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Received GamePath:\s)(?<path>.*)"
     if ($null -ne $matchesFound) {
-        [string]$gamePath = $matchesFound.Matches[0].Value
+        [string]$gamePath = ($matchesFound.Matches | Select-Object -Last 1).Value
         Write-Host $gamePath
         $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
         Write-Host $executables
@@ -40,6 +47,8 @@ function CloseLaunchedGame() {
 }
 
 function CloseDesktopGracefully() {
+    # Give Playnite enough time to save playtime statistics
+    Start-Sleep -Seconds 3 
     $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Launching PlayNite Fullscreen:\s)(?<path>.*)"
     if ($null -ne $matchesFound) {
         $desktopPath = $matchesFound.Matches[0].Value
@@ -47,6 +56,6 @@ function CloseDesktopGracefully() {
     }
 }
 
-TerminatePipe
+TerminatePipes
 CloseLaunchedGame
 CloseDesktopGracefully
