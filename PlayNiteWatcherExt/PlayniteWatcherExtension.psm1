@@ -5,7 +5,7 @@ function Send-PipeMessage($pipeName, $message) {
         $pipe = New-Object System.IO.Pipes.NamedPipeClientStream(".", $pipeName, [System.IO.Pipes.PipeDirection]::Out)
         $__logger.Info("Connecting to pipe...")
 
-        $pipe.Connect()
+        $pipe.Connect(5)
         $streamWriter = New-Object System.IO.StreamWriter($pipe)
         $__logger.Info("Sending message to pipe: $message...")
 
@@ -68,6 +68,7 @@ function OnGameStopped() {
     if (-not $isFullscreen) {
         $__logger.Info("Application is not in fullscreen, stopping playnite watcher!")
         Send-PipeMessage -pipeName "PlayniteWatcher" -message "Terminate"
+        Send-PipeMessage -pipeName "PlayniteWatcher-OnStreamStart" -message "Terminate"
     }
 }
 
