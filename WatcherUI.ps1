@@ -2,6 +2,8 @@ $isAdmin = [bool]([System.Security.Principal.WindowsIdentity]::GetCurrent().grou
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
 
+$OutputEncoding = [Console]::OutputEncoding = New-Object System.Text.Utf8Encoding
+[Console]::InputEncoding = New-Object System.Text.Utf8Encoding
 
 # If the current user is not an administrator, re-launch the script with elevated privileges
 if (-not $isAdmin) {
@@ -35,12 +37,12 @@ function LoadPlayniteExecutablePath($apps) {
 
 function SaveChanges($configPath, $JsonContent, $updatedApps) {
     $JsonContent.apps = $updatedApps
-    $JsonContent | ConvertTo-Json -Depth 100 | Set-Content -Path $configPath
+    $JsonContent | ConvertTo-Json -Depth 100 | Set-Content -Path $configPath -Encoding utf8
 }
 
 function LoadGames($configPath) {
     # Read JSON content from file
-    $JsonContent = Get-Content -Path $configPath -Raw | ConvertFrom-Json
+    $JsonContent = Get-Content -Encoding utf8 -Path $configPath -Raw | ConvertFrom-Json
 
     # Filter games with PlayNite commands
     $PlayNiteGames = $JsonContent.apps | Where-Object { ($_.detached -match 'PlayNite' -or $_.cmd -match 'PlayNite') -and ($_.name -ne "PlayNite FullScreen App") }
@@ -149,7 +151,7 @@ $window.FindName("InstallButton").Add_Click({
 
         $filePath = ".\PlayniteWatcher.ps1" 
     
-        $content = Get-Content -Path $filePath
+        $content = Get-Content -Encoding utf8 -Path $filePath
     
         $pattern = '(\$playNitePath\s*=\s*")[^"]*(")'
     
@@ -160,7 +162,7 @@ $window.FindName("InstallButton").Add_Click({
     
 
 
-        $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
+        $JsonContent = Get-Content -Encoding utf8 -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
 
         $updatedApps = $JsonContent.apps.Clone()
 
@@ -211,7 +213,7 @@ $window.FindName("UninstallButton").Add_Click({
         $msgBoxResult = [System.Windows.Forms.MessageBox]::Show($msgBoxText, $msgBoxTitle, $msgBoxButtons, $msgBoxIcon)
     
         if ($msgBoxResult -eq [System.Windows.Forms.DialogResult]::Yes) {
-            $JsonContent = Get-Content -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
+            $JsonContent = Get-Content -Encoding utf8 -Path $configPathTextBox.Text -Raw | ConvertFrom-Json
             $playnitePath = $playNitePathTextBox.Text
             $playniteRoot = Split-Path $playnitePath -Parent
             $updatedApps = $JsonContent.apps.Clone() | Where-Object {$_.name -ne "PlayNite FullScreen App"}
