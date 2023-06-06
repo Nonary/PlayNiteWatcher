@@ -103,7 +103,7 @@ function Add-PlayNiteWatcherCommand {
     $PlayNiteWatcherCommand = [PSCustomObject]@{
         do       = ""
         elevated = "false"
-        undo     = "powershell.exe -executionpolicy bypass -file `"$($scriptRoot)\PlayNiteWatcher-EndScript.ps1`""
+        undo     = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$($scriptRoot)\PlayNiteWatcher-EndScript.ps1`""
     }
 
     # Add the new object to the global_prep_cmd array

@@ -136,10 +136,13 @@ public class WindowHelper
 }
 finally {
     Write-Host "Terminating..."
-    Remove-Item "\\.\pipe\PlayniteWatcher" -ErrorAction Ignore
-    Remove-Item "\\.\pipe\PlayniteWatcher-OnStreamStart" -ErrorAction Ignore
-    Remove-Job -Name "Playnite-WatcherJob" -ErrorAction Ignore
-    Remove-Job -Name "PlayniteWatcher-OnStreamStart" -ErrorAction Ignore
+    # This makes sure that the end script is executed and closes out the pipes.
+    # PowerShell will stall for up to 2 minutes when forcefully stopping a job.
+    . $path\PlayniteWatcher-EndScript.ps1
+    Remove-Item "\\.\pipe\PlayniteWatcher" -Force -ErrorAction Ignore
+    Remove-Item "\\.\pipe\PlayniteWatcher-OnStreamStart" -Force -ErrorAction Ignore
+    Remove-Job -Name "Playnite-WatcherJob" -Force -ErrorAction Ignore
+    Remove-Job -Name "PlayniteWatcher-OnStreamStart" -Force -ErrorAction Ignore
     Stop-Transcript
 }
 

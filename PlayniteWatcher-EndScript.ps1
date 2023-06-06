@@ -32,9 +32,8 @@ function CloseLaunchedGame() {
     $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Received GamePath:\s)(?<path>.*)"
     if ($null -ne $matchesFound) {
         [string]$gamePath = ($matchesFound.Matches | Select-Object -Last 1).Value
-        Write-Host $gamePath
         $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
-        Write-Host $executables
+        Write-Host "Found the following executables in game directory: $executables"
 
         foreach ($executable in $executables) {
             $process = Get-Process -Name $executable.Name.Split('.')[0] -ErrorAction SilentlyContinue
