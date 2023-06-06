@@ -51,14 +51,15 @@ jobs:
           });
     - name: Zip the repository
       run: |
-        zip -r PlayniteWatcher.zip ${{github.workspace}}
+        rsync -a --exclude='.*' ${{github.workspace}} ${{github.workspace}}/PlayniteWatcher
+        zip -r PlayniteWatcher.zip ${{github.workspace}}/PlayniteWatcher
 
     - name: Upload zip to the release
       uses: actions/upload-release-asset@v1
       with:
         upload_url: https://github.com/${{ github.repository }}/releases/tag/{{env.tag}}
-        asset_path: ./${{ github.repository }}.zip
-        asset_name: ${{ github.repository }}.zip
+        asset_name: PlayniteWatcher.zip
+        asset_path: ${{github.workspace}}
         asset_content_type: application/zip
 
     - name: Force update the tag
