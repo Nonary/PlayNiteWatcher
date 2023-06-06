@@ -1,7 +1,10 @@
 param($playNiteId)
 
 Register-EngineEvent -SourceIdentifier GamePathRecieved -Action {
-    Write-Host ("Received GamePath: " + $event.MessageData)
+    $gamePath = $event.MessageData
+    if($null -ne $gamePath){
+        Write-Host ("Received GamePath: $gamePath")
+    }
 }
 
 $path = Split-Path $MyInvocation.MyCommand.Path -Parent

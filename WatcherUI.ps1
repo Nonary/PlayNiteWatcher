@@ -192,6 +192,7 @@ $window.FindName("InstallButton").Add_Click({
                 $app | Add-Member -MemberType NoteProperty -Name "detached" -Value @("$playnitePath --start $id") -Force
             }
         }
+        Remove-Item -Path "$playniteRoot\Extensions\PlayniteWatcherExt" -Recurse -Force -ErrorAction SilentlyContinue
         Copy-Item -Path "./PlayNiteWatcherExt"  -Destination "$playniteRoot\Extensions\PlayNiteWatcherExt" -Force  -Recurse
         SaveChanges -configPath $configPathTextBox.Text -updatedApps $updatedApps -JsonContent $JsonContent
 
