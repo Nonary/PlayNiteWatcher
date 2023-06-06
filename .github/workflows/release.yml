@@ -59,7 +59,7 @@ jobs:
       with:
         upload_url: https://github.com/${{ github.repository }}/releases/tag/{{env.tag}}
         asset_name: PlayniteWatcher.zip
-        asset_path: ${{github.workspace}}
+        asset_path: ${{github.workspace}}/PlayniteWatcher.zip
         asset_content_type: application/zip
 
     - name: Force update the tag
