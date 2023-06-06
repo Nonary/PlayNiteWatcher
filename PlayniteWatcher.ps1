@@ -77,8 +77,9 @@ try {
         }
 
         try {
-
-            Add-Type -TypeDefinition -ErrorAction SilentlyContinue @"
+            # Give Playnite Desktop enough time to be focusable.
+            Start-Sleep -Seconds 2
+            Add-Type -ErrorAction SilentlyContinue -TypeDefinition  @"
 using System;
 using System.Runtime.InteropServices;
 
@@ -97,7 +98,7 @@ public class WindowHelper
             $mainWindowHandle = (Get-Process -id $processID).MainWindowHandle
 
             # Bring the application to the foreground
-            [WindowHelper]::SetForegroundWindow($mainWindowHandle)
+            [WindowHelper]::SetForegroundWindow($mainWindowHandle) | Out-Null
         }
         catch {
             Write-Host "Failed to apply focus on FullScreen app, application such as DS4Tool may not properly activate controller profiles."
