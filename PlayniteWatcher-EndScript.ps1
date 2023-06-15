@@ -1,4 +1,7 @@
+param($terminate)
+
 $path = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+
 
 function Send-PipeMessage($pipeName, $message) {
     $pipeExists = Get-ChildItem -Path "\\.\pipe\" | Where-Object { $_.Name -eq $pipeName } 
@@ -47,7 +50,7 @@ function CloseLaunchedGame() {
 
 function CloseDesktopGracefully() {
     # Give Playnite enough time to save playtime statistics
-    Start-Sleep -Seconds 3 
+    Start-Sleep -Seconds 6 
     $matchesFound = Get-Content -Path "$path\log.txt" | Select-String "(?<=Launching PlayNite Fullscreen:\s)(?<path>.*)"
     if ($null -ne $matchesFound) {
         $desktopPath = $matchesFound.Matches[0].Value
@@ -55,6 +58,8 @@ function CloseDesktopGracefully() {
     }
 }
 
-TerminatePipes
-CloseLaunchedGame
-CloseDesktopGracefully
+if ($terminate) {
+    TerminatePipes
+    CloseLaunchedGame
+    CloseDesktopGracefully
+}

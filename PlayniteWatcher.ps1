@@ -81,7 +81,7 @@ try {
 
         try {
             # Give Playnite Desktop enough time to be focusable.
-            Start-Sleep -Seconds 2
+            Start-Sleep -Seconds 1
             Add-Type -ErrorAction SilentlyContinue -TypeDefinition  @"
 using System;
 using System.Runtime.InteropServices;
@@ -130,8 +130,6 @@ public class WindowHelper
                 break;
             }
         }
-
-        $elapsedSeconds += 1
     }
 }
 finally {
@@ -139,6 +137,7 @@ finally {
     # This makes sure that the end script is executed and closes out the pipes.
     # PowerShell will stall for up to 2 minutes when forcefully stopping a job.
     . $path\PlayniteWatcher-EndScript.ps1
+    TerminatePipes
     Remove-Item "\\.\pipe\PlayniteWatcher" -Force -ErrorAction Ignore
     Remove-Item "\\.\pipe\PlayniteWatcher-OnStreamStart" -Force -ErrorAction Ignore
     Remove-Job -Name "Playnite-WatcherJob" -Force -ErrorAction Ignore
