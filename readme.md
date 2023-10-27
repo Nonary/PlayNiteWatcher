@@ -15,11 +15,10 @@ Essentially, the purpose of this script is to use PlayNite to allow most games t
  - This script only works with Sunshine 0.20.x or above.
  - If using Windows 11, you'll need to set the default terminal to Windows Console Host as there is currently a bug in Windows Terminal that prevents hidden consoles from working properly.
     * That can be changed at Settings > Privacy & security > Security > For developers > Terminal [Let Windows decide] >> (change to) >> Terminal [Windows Console Host]
- - Prepcommands do not work from cold reboots, and will prevent Sunshine from working until you logon locally.
-   * You should add a new application (with any name you'd like) in the WebUI and leave **both** the command and detached command empty.
-   * When adding this new application, make sure global prep command option is disabled.
-   * That will serve as a fallback option when you have to remote into your computer from a cold start.
-   * Normal reboots issued from start menu, will still work without the workaround above as long as Settings > Accounts > Sign-in options and "Use my sign-in info to automatically finish setting up after an update" is enabled which is default in Windows 10 & 11.
+ - The script will stop working if you move the folder, simply reinstall it to resolve that issue.
+ - Due to Windows API restrictions, this script does not work on cold reboots (hard crashes or shutdowns of your computer).
+    * If you're cold booting, simply sign into the computer using the "Desktop" app on Moonlight, then end the stream, then start it again. 
+    * Normal reboots, such as "Restart" from start menu, does not require signing in with "Desktop" in most cases.
  - The script will stop working if you move the folder, simply reinstall it to resolve that issue.
 
 ## Prerequisites
@@ -28,8 +27,6 @@ Before starting, make sure you meet these requirements:
 
 - Your host computer must be running on Windows.
 - Sunshine must be installed as a service (the zip version of Sunshine won't work with this script).
-- Set Sunshine's logging level to Debug.
-- Users must have read permissions to `%WINDIR%/Temp/Sunshine.log` (do not change other permissions, just ensure Users have at least read permissions).
 - Sunshine is at least 0.20 or higher.
 
 ## Setup
@@ -56,7 +53,6 @@ If you encounter any issues while using the PlayNite Watcher script, try these s
 
 1. Make sure you've followed all the setup steps correctly.
 2. Verify you have the proper prerequisites installed and configured.
-3. Ensure you have read permissions for `%WINDIR%/Temp/Sunshine.log`.
-4. Verify Sunshine is at 0.20 or higher.
+3. Verify Sunshine is at 0.20 or higher.
 
 If you still experience issues after following these troubleshooting steps, please consider posting your issue on either the Sunshine or Moonlight discord. The author of this script is DemonCat.
