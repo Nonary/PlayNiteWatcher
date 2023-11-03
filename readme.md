@@ -1,58 +1,52 @@
-# PlayNite Watcher Script
+# PlayNite Watcher Script Guide
 
-Welcome to the PlayNite Watcher script for Sunshine and Moonlight! This script helps you add multiple games to Sunshine, and automatically closes Moonlight when the games are closed. It also allows you to end the stream and have it close automatically on your computer. This script creates an experience similar to GeForce Experience with its limited 300 supported games. Once the installation is done, you'll see game names, box art, and other details in Moonlight. 
+Welcome to the PlayNite Watcher script for Sunshine and Moonlight! This powerful script enables the automated addition of multiple games to Sunshine and ensures that Moonlight shuts down when you exit those games. It emulates the behavior of GeForce Experience, providing you with game names, box art, and additional details right within Moonlight once installed.
 
-If you prefer having a "Big Picture Mode" experience, or want to utilize the FullScreen mode of PlayNite this script also offers that capability as well, with the support of terminating any currently running game when you close the app from Moonlight.
+This script is also perfect for users who prefer the "Big Picture Mode" or FullScreen mode in PlayNite. It conveniently closes games launched in FullScreen mode upon exit, maintaining the same streamlined experience.
 
-# Why a script is needed
-A lot of games launch with their own launchers, and do not work without being added as a "detached" command. Unfortunately, when doing this... it prevents Sunshine and Moonlight from being able to tell if the game has closed to end the stream automatically.
+## Why the script is necessary
 
-In addition, those that prefer to add a single app for a big picture mode experience, can also benefit from this script as it will close out games and end sunshine automatically once finished. This is useful for setting up a "kiosk" PC, or handling out closing out frozen emulators using just Moonlight itself.
+Many games launch through unique launchers that initiate separate processes. As a result, these games are often added as "detached" commands, which Sunshine and Moonlight can't monitor to close the stream automatically. This script is designed to overcome that hurdle, enabling virtually any game to launch without sacrificing auto-close functionality.
 
-Essentially, the purpose of this script is to use PlayNite to allow most games to work in the way you'd expect them to work by converting them into "commands" which can be watched by Sunshine.
+Furthermore, the script is a great asset for those seeking to streamline their big picture mode experience.
+
+In short, this script enhances PlayNite by running games as "commands," thus allowing Sunshine to recognize when a game is closed.
 
 ## Caveats:
- - This script only works with Sunshine 0.20.x or above.
- - If using Windows 11, you'll need to set the default terminal to Windows Console Host as there is currently a bug in Windows Terminal that prevents hidden consoles from working properly.
-    * That can be changed at Settings > Privacy & security > Security > For developers > Terminal [Let Windows decide] >> (change to) >> Terminal [Windows Console Host]
- - The script will stop working if you move the folder, simply reinstall it to resolve that issue.
- - Due to Windows API restrictions, this script does not work on cold reboots (hard crashes or shutdowns of your computer).
-    * If you're cold booting, simply sign into the computer using the "Desktop" app on Moonlight, then end the stream, then start it again. 
-    * Normal reboots, such as "Restart" from start menu, does not require signing in with "Desktop" in most cases.
- - The script will stop working if you move the folder, simply reinstall it to resolve that issue.
+
+- The script only works with Sunshine version 0.20.x or newer.
+- On Windows 11, due to a bug in Windows Terminal, set the default terminal to Windows Console Host via Settings > Privacy & security > For developers > Terminal. Switch from [Let Windows decide] to [Windows Console Host].
+- If the installation folder is moved, the script will stop working. Reinstall the script to resolve this.
+- Due to security restrictions in Windows, this script does not function on cold reboots and you must sign in again to resolve. If you encounter a cold boot, sign in using the "Desktop" app on Moonlight, end the stream, and then restart it. This step is generally not required for normal reboots.
 
 ## Prerequisites
 
-Before starting, make sure you meet these requirements:
+Before you begin, ensure:
 
-- Your host computer must be running on Windows.
-- Sunshine must be installed as a service (the zip version of Sunshine won't work with this script).
-- Sunshine is at least 0.20 or higher.
+- Your host computer is Windows-based.
+- Sunshine is installed, version 0.20 or higher.
 
-## Setup
+## Setup Instructions
 
-Note: The script will add Playnite fullscreen mode to Sunshine automatically, so you don't have to add **every** game to Sunshine, focus on exporting your most popular ones. The fullscreen mode added is like Steams "Big Picture Mode" and can be used to launch games you have not added directly to Sunshine.
+Note: The script automatically adds Playnite's fullscreen mode to Sunshine, allowing you to skip manually adding every game—focus on your favorites.
 
-1. Open the PlayNite program on your computer.
-2. Visit the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension, when prompted by the browser to open it in PlayNite, click Open.
-3. After it is installed, you will be prompted to reboot PlayNite, please do so to proceed to the next steps.
-4. In PlayNite, select the games you want to expoty to Sunshine.
-5. Click the "Controller" menu button in the top left corner of the PlayNite window, then go to "Extensions" -> "Sunshine App Export" -> "Export selected games".
-6. If you've changed the install path of Sunshine, click the browse button to select the correct path, otherwise just click "Export Games" to finalize the export. You will be prompted for administrator rights, confirm the prompt and approve the UAC prompt (it will show up as Windows Powershell is requesting changes to your computer.)
-7. Double-click on the "Installer.bat" file. Click OK on the administrator prompt dialog. A window will open, showing the list of games you selected in step 5.
-8. If you see an error message about the program being unable to retrieve configuration, follow the instructions in the error message to fix the issue.
-9. Check the box next to each game you want to install the PlayNite Watcher Script on. Alternatively, click the Check All button to select all PlayNite games added to Sunshine.
-10. Click the "Install" button when you're ready.
-
-
-Installing the script will automatically add a Playnite application to Sunshine which will launch the fullscreen of Playnite, which can be used to launch your least popular games if you prefer not to add everything to Sunshine.
+1. Open the PlayNite application on your computer.
+2. Navigate to the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension. When prompted, open it in PlayNite.
+3. Restart PlayNite as instructed to move to the next steps.
+4. Select the games you want to export to Sunshine within PlayNite.
+5. Go to "Controller" in the top-left corner, then "Extensions" -> "Sunshine App Export" -> "Export selected games."
+6. If Sunshine's installation path has changed, click "Browse" to find it; if not, click "Export Games." Confirm the admin rights UAC prompt that appears.
+7. Run "Installer.bat" by double-clicking it, and accept the admin prompt. A list of your selected games will be displayed.
+8. Follow any provided instructions if a configuration error occurs.
+9. Mark the checkboxes next to each game to which you want to apply the script, or select "Check All" for all games.
+10. Click "Install" to finalize the setup.
 
 ## Troubleshooting
 
-If you encounter any issues while using the PlayNite Watcher script, try these steps to resolve them:
+If you encounter issues with the PlayNite Watcher script, take the following steps:
 
-1. Make sure you've followed all the setup steps correctly.
-2. Verify you have the proper prerequisites installed and configured.
-3. Verify Sunshine is at 0.20 or higher.
+1. Revisit the setup instructions to verify correct completion.
+2. Check that all prerequisites are in place and configured correctly.
+3. Ensure Sunshine is updated to at least version 0.20.
 
-If you still experience issues after following these troubleshooting steps, please consider posting your issue on either the Sunshine or Moonlight discord. The author of this script is DemonCat.
+If problems persist, seek further support on the Sunshine or Moonlight Discord channels. The script's creator is DemonCat.
