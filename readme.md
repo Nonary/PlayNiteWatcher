@@ -14,10 +14,13 @@ In short, this script enhances PlayNite by running games as "commands," thus all
 
 ## Caveats:
 
-- The script only works with Sunshine version 0.20.x or newer.
-- On Windows 11, due to a bug in Windows Terminal, set the default terminal to Windows Console Host via Settings > Privacy & security > For developers > Terminal. Switch from [Let Windows decide] to [Windows Console Host].
-- If the installation folder is moved, the script will stop working. Reinstall the script to resolve this.
-- Due to security restrictions in Windows, this script does not function on cold reboots and you must sign in again to resolve. If you encounter a cold boot, sign in using the "Desktop" app on Moonlight, end the stream, and then restart it. This step is generally not required for normal reboots.
+ - If using Windows 11, you'll need to set the default terminal to Windows Console Host as there is currently a bug in Windows Terminal that prevents hidden consoles from working properly.
+    * That can be changed at Settings > System > For Developers > Terminal [Let Windows decide] >> (change to) >> Terminal [Windows Console Host]
+    * On older versions of Windows 11 it can be found at: Settings > Privacy & security > Security > For developers > Terminal [Let Windows decide] >> (change to) >> Terminal [Windows Console Host]
+ - The script will stop working if you move the folder, simply reinstall it to resolve that issue.
+ - Due to Windows API restrictions, this script does not work on cold reboots (hard crashes or shutdowns of your computer).
+    * If you're cold booting, simply sign into the computer using the "Desktop" app on Moonlight, then end the stream, then start it again. 
+    * Normal reboots issued from start menu will function as intended, no workarounds needed.
 
 ## Prerequisites
 
