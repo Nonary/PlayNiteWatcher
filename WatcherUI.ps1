@@ -53,7 +53,7 @@ function LoadPlayniteExecutablePath() {
 
 function SaveChanges($configPath, $updatedApps) {
 
-    $appConfiguration =  Get-Content -Encoding utf8 -Path $configPath -Raw | ConvertFrom-Json
+    $appConfiguration = Get-Content -Encoding utf8 -Path $configPath -Raw | ConvertFrom-Json
     [object[]]$filteredApps = FilterPlayniteApps -configPath $configPath
 
     foreach ($app in $updatedApps) {
@@ -102,9 +102,9 @@ function ParseGames($configPath) {
     return $apps
 }
 
-function FilterPlayniteApps($configPath){
+function FilterPlayniteApps($configPath) {
     $JsonContent = Get-Content -Encoding utf8 -Path $configPath -Raw | ConvertFrom-Json
-    return $JsonContent.apps | Where-Object {$_.cmd -notlike '*playnite*' -and $_.detached -notlike '*playnite*'}
+    return $JsonContent.apps | Where-Object { $_.cmd -notlike '*playnite*' -and $_.detached -notlike '*playnite*' }
 }
 
 function RemoveDuplicates($apps) {
@@ -201,20 +201,24 @@ $window.FindName("InstallButton").Add_Click({
         $updatedApps = RemoveDuplicates -apps $updatedApps
 
 
-        ## add FullScreen applet
-        if ($null -eq ($updatedApps | Where-Object { $_.name -eq "PlayNite FullScreen App" })) {
-            $updatedApps += [PSCustomObject]@{
-                applicationName = "PlayNite FullScreen App"
-                imagePath       = "$scriptPath\playnite-boxart.png"
-                cmd             = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
-                detached        = ""
-            }
-        }
+
 
         foreach ($playniteApp in $updatedApps) {
             $installCount += 1
             $playniteApp.detached = ""
             $playniteApp.cmd = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" $($playniteApp.uniqueId)"
+        }
+
+        ## add FullScreen applet
+        if ($null -eq ($updatedApps | Where-Object { $_.name -eq "PlayNite FullScreen App" })) {
+            $updatedApps = ,[PSCustomObject]@{
+                applicationName = "PlayNite FullScreen App"
+                imagePath       = "$scriptPath\playnite-boxart.png"
+                cmd             = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
+                detached        = ""
+            } +  $updatedApps
+
+            
         }
 
             
@@ -243,7 +247,7 @@ $window.FindName("UninstallButton").Add_Click({
         if ($msgBoxResult -eq [System.Windows.Forms.DialogResult]::Yes) {
             $playnitePath = $playNitePathTextBox.Text
             $playniteRoot = Split-Path $playnitePath -Parent
-            $parsedApps = ParseGames -configPath $configPathTextBox.Text | ForEach-Object {$_.uniqueId = "" | Out-Null; $_}
+            $parsedApps = ParseGames -configPath $configPathTextBox.Text | ForEach-Object { $_.uniqueId = "" | Out-Null; $_ }
 
             SaveChanges -configPath $configPathTextBox.Text -updatedApps $parsedApps
 

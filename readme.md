@@ -41,8 +41,13 @@ Note: The script automatically adds Playnite's fullscreen mode to Sunshine, allo
 6. If Sunshine's installation path has changed, click "Browse" to find it; if not, click "Export Games." Confirm the admin rights UAC prompt that appears.
 7. Run "Installer.bat" by double-clicking it, and accept the admin prompt. A list of your selected games will be displayed.
 8. Follow any provided instructions if a configuration error occurs.
-9. Mark the checkboxes next to each game to which you want to apply the script, or select "Check All" for all games.
-10. Click "Install" to finalize the setup.
+9. Click "Install" to finalize the setup
+
+The script will automatically remove any duplicate applications during an export and will also remove all exports when uninstalling the script.
+
+You will need to export and install the script again each time you wish to add more games to Sunshine. 
+
+To remove applications, visit the Sunshine Web UI application tab and remove them there, or uninstall the script to automatically remove all exports.
 
 ## Troubleshooting
 
