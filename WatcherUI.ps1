@@ -121,6 +121,25 @@ function RemoveDuplicates($apps) {
     return $dict.Values
 }
 
+function SaveSettings() {
+    ## Replace the $playNitePath with the users selection
+    $playnitePath = $playNitePathTextBox.Text
+       
+        
+    $filePath = ".\PlayniteWatcher.ps1"
+            
+    $content = Get-Content -Encoding utf8 -Path $filePath
+            
+    $playNitePattern = '(\$playNitePath\s*=\s*")[^"]*(")'
+    $configPattern = '(\$sunshineConfigPath\s*=\s*")[^"]*(")'
+            
+    $updatedContent = $content -replace $playNitePattern, "`$1$($playnitePath.Replace('\', '\\'))`$2"
+    $updatedContent = $updatedContent -replace $configPattern, "`$1$($configPathTextBox.Text.Replace('\', '\\'))`$2"
+            
+    Set-Content -Path $filePath -Value $updatedContent
+    ######
+}
+
 
 # OpenFileDialog Function
 function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
@@ -136,7 +155,7 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Playnite Watcher Installer" Height="200" Width="635">
+        Title="Playnite Watcher Installer" Height="230" Width="720">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -145,19 +164,25 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Margin="10">
-            <Label Content="Sunshine Config Location:" VerticalAlignment="Center" Width="165"/>
-            <TextBox Name="ConfigPath" Text="C:\Program Files\Sunshine\config\apps.json" Margin="5,0,5,0" Width="325" Height="25"/>
+            <Label Content="Sunshine Apps.json Path:" VerticalAlignment="Center" Width="165"/>
+            <TextBox Name="ConfigPath" Text="C:\Program Files\Sunshine\config\apps.json" Margin="5,0,5,0" Width="325" Height="25" IsReadOnly="true"/>
             <Button Name="BrowseButton" Content="Browse" Width="75" HorizontalAlignment="Left" Margin="5,0,5,0" Height="25"/>
         </DockPanel>
         <DockPanel Grid.Row="1" Margin="10">
-            <Label Content="Playnite Executable Location:" VerticalAlignment="Center" Width="165"/>
-            <TextBox Name="PlaynitePath" Text="C:\Program Files\Playnite\Playnite.DesktopApp.exe" Margin="5,0,5,0" Width="325" Height="25"/>
+            <Label Content="Playnite Executable Path:" VerticalAlignment="Center" Width="165"/>
+            <TextBox Name="PlaynitePath" Text="C:\Program Files\Playnite\Playnite.DesktopApp.exe" Margin="5,0,5,0" Width="325" Height="25" IsReadOnly="true"/>
             <Button Name="PlayniteBrowseButton" Content="Browse" Width="75" HorizontalAlignment="Left" Margin="5,0,5,0" Height="25"/>
         </DockPanel>
+
+
         <DockPanel Grid.Row="2" Margin="10" VerticalAlignment="Top">
             <Button Name="InstallButton" Content="Install" Width="75" Height="25" Margin="2,0,2,0"/>
             <Button Name="UninstallButton" Content="Uninstall" Width="75" Height="25" Margin="2,0,2,0"/>
         </DockPanel>
+
+        <TextBlock Grid.Row="3" Margin="0" TextWrapping="Wrap" HorizontalAlignment="Center" FontWeight="Bold">
+        NOTE: Clicking the buttons above will terminate existing sessions on Moonlight and will also restart Playnite.
+    </TextBlock>
     </Grid>
 </Window>
 "@
@@ -172,30 +197,17 @@ $playNitePathTextBox = $window.FindName("PlaynitePath")
 $window.FindName("BrowseButton").Add_Click({
         ShowOpenFileDialog -filter "JSON files (*.json)|*.json|All files (*.*)|*.*" -initialDirectory ([System.IO.Path]::GetDirectoryName($configPathTextBox.Text)) -textBox $configPathTextBox
         LoadGames -configPath $configPathTextBox.Text
+        SaveSettings
     })
 
 $window.FindName("PlayniteBrowseButton").Add_Click({
-        ShowOpenFileDialog -filter "Exe files (*.exe)|*.exe|All files (*.*)|*.*" -initialDirectory ([System.IO.Path]::GetDirectoryName($playNitePathTextBox.Text)) -textBox $playNitePathTextBox
+        ShowOpenFileDialog -filter "Playnite Executable|Playnite.DesktopApp.exe" -initialDirectory ([System.IO.Path]::GetDirectoryName($playNitePathTextBox.Text)) -textBox $playNitePathTextBox
+        SaveSettings
     })
 
 $window.FindName("InstallButton").Add_Click({
         $installCount = 0
-        ## Replace the $playNitePath with the users selection
-        $playnitePath = $playNitePathTextBox.Text
-        $playniteRoot = Split-Path $playnitePath -Parent
-
-        $filePath = ".\PlayniteWatcher.ps1"
-
-        $content = Get-Content -Encoding utf8 -Path $filePath
-
-        $playNitePattern = '(\$playNitePath\s*=\s*")[^"]*(")'
-        $configPattern = '(\$sunshineConfigPath\s*=\s*")[^"]*(")'
-
-        $updatedContent = $content -replace $playNitePattern, "`$1$($playnitePath.Replace('\', '\\'))`$2"
-        $updatedContent = $updatedContent -replace $configPattern, "`$1$($configPathTextBox.Text.Replace('\', '\\'))`$2"
-
-        Set-Content -Path $filePath -Value $updatedContent
-        ######
+        $playniteRoot = Split-Path $playNitePathTextBox.Text -Parent
 
         $updatedApps = ParseGames -configPath $configPathTextBox.Text
         $updatedApps = RemoveDuplicates -apps $updatedApps
@@ -211,12 +223,12 @@ $window.FindName("InstallButton").Add_Click({
 
         ## add FullScreen applet
         if ($null -eq ($updatedApps | Where-Object { $_.name -eq "PlayNite FullScreen App" })) {
-            $updatedApps = ,[PSCustomObject]@{
+            $updatedApps = , [PSCustomObject]@{
                 applicationName = "PlayNite FullScreen App"
                 imagePath       = "$scriptPath\playnite-boxart.png"
                 cmd             = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
                 detached        = ""
-            } +  $updatedApps
+            } + $updatedApps
 
             
         }
@@ -232,7 +244,14 @@ $window.FindName("InstallButton").Add_Click({
         }
 
         & $scopedInstall
-        [System.Windows.Forms.MessageBox]::Show("You can now close this application, the script has been successfully installed to $installCount application(s)", "Installation Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+
+ 
+        [System.Windows.Forms.MessageBox]::Show("The script has been successfully installed to $installCount application(s)!`nAfter clicking OK on this message, PlayNite will be restarted to finish the installation.", "Installation Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+        # Restart Playnite
+        Get-Process Playnite.DesktopApp -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
+
+        ## Tunnel it through explorer.exe so it doesn't inherit administrator rights.
+        Start-Process -FilePath explorer.exe -ArgumentList $playNitePathTextBox.Text
 
     })
 
@@ -283,6 +302,8 @@ $window.Add_Loaded({
             [System.Windows.Forms.MessageBox]::Show("An issue was encountered while attempting to retrieve the PlayNite executable path. Once you dismiss this message, a window will open, prompting you to locate the PlayNite folder. Please ensure that you choose the PlayNite folder and select the `"PlayNiteDesktop.exe`" file within it.", "Error: Could not find PlayNite Executable", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
             ShowOpenFileDialog -filter "Playnite Exe|Playnite.DesktopApp.exe|All files (*.*)|*.*" -textBox $playNitePathTextBox
         }
+
+        SaveSettings
     })
 
 # Show WPF window
