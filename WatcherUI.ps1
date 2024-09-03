@@ -5,6 +5,8 @@ Add-Type -AssemblyName System.Windows.Forms
 $OutputEncoding = [Console]::OutputEncoding = New-Object System.Text.Utf8Encoding
 [Console]::InputEncoding = New-Object System.Text.Utf8Encoding
 
+$flagFilePath = "$env:APPDATA\PlayniteWatcher\PlayniteWatcherAdminFlag"
+
 class ApplicationInfo {
     [string]$applicationName
     [string]$uniqueId
@@ -13,25 +15,28 @@ class ApplicationInfo {
     [string]$imagePath
 }
 
-
-
-# If the current user is not an administrator, re-launch the script with elevated privileges
+# To minimize prompts, we will only warn the user once about admin rights.
 if (-not $isAdmin) {
-    $result = [System.Windows.Forms.MessageBox]::Show("You will be prompted for administrator rights, as Sunshine requires admin in order to modify the apps.json file.", "Administrator Required", [System.Windows.Forms.MessageBoxButtons]::OKCancel, [System.Windows.Forms.MessageBoxIcon]::Information)
-    if ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        exit
+    if (-not (Test-Path $flagFilePath)) {
+        $result = [System.Windows.Forms.MessageBox]::Show("You will be prompted for administrator rights, as Sunshine requires admin in order to modify the apps.json file.", "Administrator Required", [System.Windows.Forms.MessageBoxButtons]::OKCancel, [System.Windows.Forms.MessageBoxIcon]::Information)
+        New-Item -ItemType File -Path $flagFilePath -Force
+        if ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+            exit
+        }
     }
+
     else {
-        Start-Process powershell.exe  -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`"" -WindowStyle Hidden
+        Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`"" -WindowStyle Hidden
         exit
     }
 }
+
+
 
 $scriptPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 Set-Location $scriptPath
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
-
 
 function LoadConfigFilePath() {
     # Retrieve the path utilizing regex from the primary script.
@@ -181,7 +186,7 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
         </DockPanel>
 
         <TextBlock Grid.Row="3" Margin="0" TextWrapping="Wrap" HorizontalAlignment="Center" FontWeight="Bold">
-        NOTE: Clicking the buttons above will terminate existing sessions on Moonlight and will also restart Playnite.
+        NOTICE: Clicking install or uninstall will terminate existing Moonlight sessions and restart Playnite to finish the installation.
     </TextBlock>
     </Grid>
 </Window>
@@ -246,12 +251,17 @@ $window.FindName("InstallButton").Add_Click({
         & $scopedInstall
 
  
-        [System.Windows.Forms.MessageBox]::Show("The script has been successfully installed to $installCount application(s)!`nAfter clicking OK on this message, PlayNite will be restarted to finish the installation.", "Installation Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-        # Restart Playnite
-        Get-Process Playnite.DesktopApp -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
 
-        ## Tunnel it through explorer.exe so it doesn't inherit administrator rights.
-        Start-Process -FilePath explorer.exe -ArgumentList $playNitePathTextBox.Text
+        ## Open it in a background thread, that way if user disconnected from a moonlight session it will still restart playnite.
+        Start-Job -ArgumentList $playNitePathTextBox.Text {
+            param($path)
+            Start-Sleep -Seconds 5
+            Get-Process Playnite.DesktopApp -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
+            Start-Process -FilePath explorer.exe -ArgumentList $path
+        }
+        
+        [System.Windows.Forms.MessageBox]::Show("The script has been successfully installed to $installCount application(s)!", "Installation Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+        
 
     })
 

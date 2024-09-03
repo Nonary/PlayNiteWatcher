@@ -29,32 +29,53 @@ Before you begin, ensure:
 - Your host computer is Windows-based.
 - Sunshine is installed, version 0.20 or higher.
 
+
 ## Setup Instructions
 
-Note: The script automatically adds Playnite's fullscreen mode to Sunshine, allowing you to skip manually adding every game—focus on your favorites.
+**Note:** This script automatically adds Playnite's fullscreen mode to Sunshine, so you don't need to manually add every game—just focus on your favorites.
 
-1. Open the PlayNite application on your computer.
-2. Navigate to the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension. When prompted, open it in PlayNite.
-3. Restart PlayNite as instructed to move to the next steps.
-4. Select the games you want to export to Sunshine within PlayNite.
-5. Go to "Controller" in the top-left corner, then "Extensions" -> "Sunshine App Export" -> "Export selected games."
-6. If Sunshine's installation path has changed, click "Browse" to find it; if not, click "Export Games." Confirm the admin rights UAC prompt that appears.
-7. Run "Installer.bat" by double-clicking it, and accept the admin prompt. A list of your selected games will be displayed.
-8. Follow any provided instructions if a configuration error occurs.
-9. Click "Install" to finalize the setup
+1. **Open PlayNite**: Launch the PlayNite application on your computer.
+2. **Download the Extension**: Visit the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension. When prompted, open the extension in PlayNite.
+3. **Restart PlayNite**: Follow the on-screen instructions to restart PlayNite and proceed to the next steps.
+4. **Select Games to Export**: In PlayNite, select the games you want to export to Sunshine.
+5. **Export Games**:
+   - Click on "Controller" in the top-left corner.
+   - Navigate to "Extensions" -> "Sunshine App Export" -> "Export selected games."
+6. **Specify Sunshine Path**: If the installation path for Sunshine has changed, click "Browse" to locate it. If the path is correct, click "Export Games." Confirm the User Account Control (UAC) prompt that appears.
+7. **Run the Installer**: Double-click "Installer.bat" and accept the UAC prompt to continue. 
+8. **Handle Configuration Errors**: If a configuration error occurs, follow any additional instructions provided.
+9. **Finalize Setup**: Click "Install" to complete the setup process. This will terminate any existing Moonlight sessions and restart PlayNite.
 
-The script will automatically remove any duplicate applications during an export and will also remove all exports when uninstalling the script.
+### Important Notes:
+- **Automatic Duplicate Removal**: The script automatically removes duplicate exports when installing, so you don't have to worry about accidentally adding the same game more than once.
+- **Re-exporting Games**: You need to re-export and reinstall the script each time you want to add more games to Sunshine.
+- **Removing Applications**: To remove exported applications, either:
+  - Visit the Sunshine Web UI application tab and remove them manually, or
+  - Uninstall the script, which will remove remove **all** exported games.
 
-You will need to export and install the script again each time you wish to add more games to Sunshine. 
-
-To remove applications, visit the Sunshine Web UI application tab and remove them there, or uninstall the script to automatically remove all exports.
 
 ## Troubleshooting
 
-If you encounter issues with the PlayNite Watcher script, take the following steps:
+If you encounter any issues with the PlayNite Watcher script, follow these steps:
 
-1. Revisit the setup instructions to verify correct completion.
-2. Check that all prerequisites are in place and configured correctly.
-3. Ensure Sunshine is updated to at least version 0.20.
+1. **Review Setup Instructions**: Double-check the setup instructions to ensure all steps were completed correctly.
+2. **Verify Prerequisites**: Confirm that all required prerequisites are installed and properly configured.
+3. **Update Sunshine**: Ensure that Sunshine is updated to at least version 0.20.
 
-If problems persist, seek further support on the Sunshine or Moonlight Discord channels. The script's creator is DemonCat.
+### Export Issues: Not All Games Are Exported
+The export feature only works for games with downloaded metadata. If you have added games manually (e.g., via scanning or manual entry), ensure that you download all necessary metadata for those games. To download metadata in Playnite:
+
+1. Right-click the game in Playnite.
+2. Select "Edit."
+3. Click the "Download Metadata" button.
+4. Choose "IGDB," select the correct game name, and follow the on-screen instructions to import all available data.
+
+**Tip:** You can automate metadata downloads for all games by clicking the Playnite menu button and selecting "Download Metadata" (or press Control + D).
+
+### Session Not Terminating When Closing a Game
+If the script doesn’t terminate the session when you close a game, it may be due to the script being saved in a location that requires administrator rights. This script does not run in administrator mode. To resolve this:
+
+- Adjust the folder's file permissions to allow write access for users.
+- Alternatively, move the folder to your user profile (e.g., Documents, Desktop) and reinstall the script.
+
+If these steps don’t resolve your issues, seek further support on the Sunshine or Moonlight Discord channels. You can also contact the script creator, demon.cat, for additional help.
