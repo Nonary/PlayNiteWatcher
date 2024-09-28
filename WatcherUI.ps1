@@ -13,6 +13,9 @@ class ApplicationInfo {
     [string]$cmd
     [string]$detached
     [string]$imagePath
+    [string]$waitAll
+    [string]$autoDetach
+    [string]$exitTimeout
 }
 
 # To minimize prompts, we will only warn the user once about admin rights.
@@ -67,8 +70,11 @@ function SaveChanges($configPath, $updatedApps) {
         }
         
         $jsonApp = [PSCustomObject]@{
-            'image-path' = $app.imagePath
-            name         = $app.applicationName
+            'image-path'   = $app.imagePath
+            name           = $app.applicationName
+            'wait-all'     = $app.waitAll
+            'exit-timeout' = $app.exitTimeout
+            'auto-detach'  = $app.autoDetach
         }
         if ($app.cmd -ne "") {
             $jsonApp | Add-Member -MemberType NoteProperty  -Name "cmd" -Value $app.cmd -Force
@@ -99,6 +105,9 @@ function ParseGames($configPath) {
             $app.imagePath = $_.'image-path'
             $app.cmd = $_.cmd
             $app.detached = $_.detached
+            $app.exitTimeout = if ($_. 'exit-timeout') { $_.'exit-timeout' } else { "5" }
+            $app.waitAll = if ($_. 'wait-all') { $_.'wait-all' } else { "false" }
+            $app.autoDetach = if ($_. 'auto-detach') { $_.'auto-detach' } else { "false" }
 
             $apps += $app
         }
@@ -233,6 +242,9 @@ $window.FindName("InstallButton").Add_Click({
                 imagePath       = "$scriptPath\playnite-boxart.png"
                 cmd             = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
                 detached        = ""
+                waitAll         = "false"
+                autoDetach      = "false"
+                exitTimeout     = "5"
             } + $updatedApps
 
             
