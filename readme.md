@@ -35,7 +35,7 @@ Before you begin, ensure:
 **Note:** This script automatically adds Playnite's fullscreen mode to Sunshine, so you don't need to manually add every game—just focus on your favorites.
 
 1. **Open PlayNite**: Launch the PlayNite application on your computer.
-2. **Download the Extension**: Visit the [Playnite Add-ons page](https://playnite.link/addons.html) and download the "Sunshine App Export" extension. When prompted, open the extension in PlayNite.
+2. **Download the Extension**: Visit the [Playnite Add-ons page](https://playnite.link/addons.html#SunshineAppExport) and download the "Sunshine App Export" extension. When prompted, open the extension in PlayNite.
 3. **Restart PlayNite**: Follow the on-screen instructions to restart PlayNite and proceed to the next steps.
 4. **Select Games to Export**: In PlayNite, select the games you want to export to Sunshine.
 5. **Export Games**:
