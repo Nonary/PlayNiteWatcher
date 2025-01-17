@@ -2,9 +2,11 @@ param($playNiteId)
 
 Register-EngineEvent -SourceIdentifier GamePathRecieved -Action {
     $gamePath = $event.MessageData
-    if($null -ne $gamePath){
+    if ($null -ne $gamePath) {
         Write-Host ("Received GamePath: $gamePath")
     }
+    
+    Watch-AndApplyFocusToGame -gamePath $gamePath -maximumAttempts 10
 }
 
 $path = Split-Path $MyInvocation.MyCommand.Path -Parent
@@ -16,6 +18,65 @@ $fullScreenMode = $false
 
 Start-Transcript $path\log.txt
 
+
+function Set-ForegroundWindow {
+    param (
+        [string]$processName
+    )
+
+    Add-Type -ErrorAction SilentlyContinue -TypeDefinition  @"
+    using System;
+    using System.Runtime.InteropServices;
+
+    public class WindowHelper
+    {
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+    }
+"@
+
+    # Get the process ID (PID) of the application you want to bring to the foreground
+    $processID = Get-Process -Name $processName | Select-Object -ExpandProperty ID
+
+    # Find the application's main window handle using the process ID
+    $mainWindowHandle = (Get-Process -id $processID).MainWindowHandle
+
+    # Bring the application to the foreground
+    [WindowHelper]::SetForegroundWindow($mainWindowHandle) | Out-Null
+}
+
+function Watch-AndApplyFocusToGame {
+    param (
+        [string]$gamePath,
+        [int]$maximumAttempts = 10
+    )
+
+    $executables = Get-ChildItem -Path $gamePath -Filter *.exe -Recurse
+    Write-Host "Found the following executables in game directory: $executables"
+
+    $attempts = 0
+
+    while ($attempts -lt $maximumAttempts) {
+        $attempts++
+        Start-Sleep -Seconds 1
+        $processInfos = @()
+        foreach ($executable in $executables) {
+            $process = Get-Process -Name $executable.Name.Split('.')[0] -ErrorAction SilentlyContinue
+            if ($null -ne $process) {
+                $processInfos += $process
+            }
+        }
+
+        $foundInfo = $processInfos | Sort-Object -Property WorkingSet64 -Descending | Select-Object -First 1 
+
+        if ($null -ne $foundInfo) {
+            Write-Host "Found the following process: $($foundInfo.Name) with WorkingSet64: $($foundInfo.WorkingSet64)"
+            Write-Host "Applying foreground focus to process: $($foundInfo.Name)"
+            Set-ForegroundWindow -processName $foundInfo.Name
+        }
+    }
+}
 
 try {
 
@@ -83,26 +144,7 @@ try {
         try {
             # Give Playnite Desktop enough time to be focusable.
             Start-Sleep -Seconds 1
-            Add-Type -ErrorAction SilentlyContinue -TypeDefinition  @"
-using System;
-using System.Runtime.InteropServices;
-
-public class WindowHelper
-{
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool SetForegroundWindow(IntPtr hWnd);
-}
-"@
-
-            # Get the process ID (PID) of the application you want to bring to the foreground
-            $processID = Get-Process -Name "Playnite.FullscreenApp" | Select-Object -ExpandProperty ID
-
-            # Find the application's main window handle using the process ID
-            $mainWindowHandle = (Get-Process -id $processID).MainWindowHandle
-
-            # Bring the application to the foreground
-            [WindowHelper]::SetForegroundWindow($mainWindowHandle) | Out-Null
+            Set-ForegroundWindow "Playnite.FullscreenApp"
         }
         catch {
             Write-Host "Failed to apply focus on FullScreen app, application such as DS4Tool may not properly activate controller profiles."
