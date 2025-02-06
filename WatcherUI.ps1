@@ -105,7 +105,7 @@ function ParseGames($configPath) {
             $app.imagePath = $_.'image-path'
             $app.cmd = $_.cmd
             $app.detached = $_.detached
-            $app.exitTimeout = if ($_. 'exit-timeout') { $_.'exit-timeout' } else { "5" }
+            $app.exitTimeout = if ($_. 'exit-timeout') { $_.'exit-timeout' } else { "0" }
             $app.waitAll = if ($_. 'wait-all') { $_.'wait-all' } else { "false" }
             $app.autoDetach = if ($_. 'auto-detach') { $_.'auto-detach' } else { "false" }
 
