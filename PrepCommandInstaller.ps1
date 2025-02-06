@@ -5,7 +5,7 @@ $scriptPath = "$scriptRoot\OnScriptEnd.ps1"
 
 
 # Define the path to the Sunshine configuration file
-$confPath = "C:\Program Files\Sunshine\config\sunshine.conf"
+$sunshineConfigPath = "C:\\Program Files\\Sunshine\\config"
 $scriptRoot = Split-Path $scriptPath -Parent
 
 
@@ -14,7 +14,8 @@ $scriptRoot = Split-Path $scriptPath -Parent
 function Get-GlobalPrepCommand {
 
     # Read the contents of the configuration file into an array of strings
-    $config = Get-Content -Path $confPath
+    $config = Get-Content (Join-Path $sunshineConfigPath "sunshine.conf")
+    
 
     # Find the line that contains the global_prep_cmd setting
     $globalPrepCmdLine = $config | Where-Object { $_ -match '^global_prep_cmd\s*=' }
@@ -33,7 +34,7 @@ function Get-GlobalPrepCommand {
 function Remove-PlayNiteWatcherCommand {
 
     # Get the current value of global_prep_cmd as a JSON string
-    $globalPrepCmdJson = Get-GlobalPrepCommand -ConfigPath $confPath
+    $globalPrepCmdJson = Get-GlobalPrepCommand -ConfigPath $sunshineConfigPath
 
     # Convert the JSON string to an array of objects
     $globalPrepCmdArray = $globalPrepCmdJson | ConvertFrom-Json
@@ -63,10 +64,10 @@ function Set-GlobalPrepCommand {
 
 
     # Read the contents of the configuration file into an array of strings
-    $config = Get-Content -Path $confPath
+    $config = Get-Content (Join-Path $sunshineConfigPath "sunshine.conf")
 
     # Get the current value of global_prep_cmd as a JSON string
-    $currentValueJson = Get-GlobalPrepCommand -ConfigPath $confPath
+    $currentValueJson = Get-GlobalPrepCommand -ConfigPath $sunshineConfigPath
 
     # Convert the new value to a JSON string
     $newValueJson = ConvertTo-Json -InputObject $Value -Compress
@@ -90,14 +91,14 @@ function Set-GlobalPrepCommand {
 
 
     # Write the modified config array back to the file
-    $config | Set-Content -Path $confPath -Force
+    $config | Set-Content -Path $sunshineConfigPath -Force
 }
 
 # Add a new command to run PlayNiteWatcher.ps1 to the global_prep_cmd value
 function Add-PlayNiteWatcherCommand {
 
     # Remove any existing commands that contain PlayNiteWatcher from the global_prep_cmd value
-    $globalPrepCmdArray = Remove-PlayNiteWatcherCommand -ConfigPath $confPath
+    $globalPrepCmdArray = Remove-PlayNiteWatcherCommand -ConfigPath $sunshineConfigPath
 
     # Create a new object with the command to run PlayNiteWatcher.ps1
     $PlayNiteWatcherCommand = [PSCustomObject]@{
