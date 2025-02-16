@@ -27,7 +27,7 @@ In short, this script enhances PlayNite by running games as "commands," thus all
 Before you begin, ensure:
 
 - Your host computer is Windows-based.
-- Sunshine is installed, version 0.20 or higher.
+- Sunshine is installed, version [v2025.122.141614](https://github.com/LizardByte/Sunshine/releases/tag/v2025.122.141614) or higher.
 
 
 ## Setup Instructions
