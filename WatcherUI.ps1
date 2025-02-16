@@ -250,7 +250,7 @@ $window.FindName("InstallButton").Add_Click({
             waitAll         = $false
             autoDetach      = $false
             exitTimeout     = 5
-            uuid            = (New-Guid).GUID.ToUpper()
+            uuid            = "14D9821B-7EA2-48C2-9AF7-970608282F93"
         } + $updatedApps
     }
 
