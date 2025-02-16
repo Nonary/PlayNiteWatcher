@@ -10,12 +10,13 @@ $flagFilePath = "$env:APPDATA\PlayniteWatcher\PlayniteWatcherAdminFlag"
 class ApplicationInfo {
     [string]$applicationName
     [string]$uniqueId
+    [string]$uuid
     [string]$cmd
     [string]$detached
     [string]$imagePath
-    [string]$waitAll
-    [string]$autoDetach
-    [string]$exitTimeout
+    [bool]$waitAll
+    [bool]$autoDetach
+    [int]$exitTimeout
 }
 
 # To minimize prompts, we will only warn the user once about admin rights.
@@ -44,7 +45,7 @@ function LoadConfigFilePath() {
     $ma = $scriptContents | select-string '(\$sunshineConfigPath)\s=\s"(.*)"'
     $foundPath = $ma.Matches.Groups[2].Value
     if (-not (Test-Path $foundPath)) {
-        throw "Could not verify Sunshine config path"
+        throw "Could not verify Sunshine/Apollo config path"
     }
     $configPathTextBox.Text = $foundPath.Replace('\\', '\')
 }
@@ -67,13 +68,14 @@ function SaveChanges($configPath, $updatedApps) {
         if ($app.uniqueId -eq "") {
             continue;
         }
-        
+
         $jsonApp = [PSCustomObject]@{
             'image-path'   = $app.imagePath
             name           = $app.applicationName
             'wait-all'     = $app.waitAll
             'exit-timeout' = $app.exitTimeout
             'auto-detach'  = $app.autoDetach
+            'uuid'         = $app.uuid
         }
         if ($app.cmd -ne "") {
             $jsonApp | Add-Member -MemberType NoteProperty -Name "cmd" -Value $app.cmd -Force
@@ -98,12 +100,24 @@ function ParseGames($configPath) {
             $id = $Matches[1]
             $app.applicationName = $_.name
             $app.uniqueId = $id
+            $app.uuid = if ($_.uuid) { $_.uuid } else { $id.ToUpper() }
             $app.imagePath = $_.'image-path'
             $app.cmd = $_.cmd
             $app.detached = $_.detached
-            $app.exitTimeout = if ($_. 'exit-timeout') { $_.'exit-timeout' } else { "0" }
-            $app.waitAll = if ($_. 'wait-all') { $_.'wait-all' } else { "false" }
-            $app.autoDetach = if ($_. 'auto-detach') { $_.'auto-detach' } else { "false" }
+            $app.exitTimeout = if ($_.'exit-timeout') { $_.'exit-timeout' } else { 0 }
+
+            $app.waitAll = if ($_.'wait-all') {
+                ($_.'wait-all' -eq $true) -or ($_.'wait-all' -eq "true")
+            } else {
+                $false
+            }
+
+            $app.autoDetach = if ($_.'auto-detach') {
+                ($_.'auto-detach' -eq $true) -or ($_.'auto-detach' -eq "true")
+            } else {
+                $false
+            }
+
             $apps += $app
         }
     }
@@ -131,7 +145,7 @@ function RemoveDuplicates($apps) {
 
 function SaveSettings() {
     ## Replace the $playNitePath with the users selection
-    $playnitePath = $playNitePathTextBox.Text       
+    $playnitePath = $playNitePathTextBox.Text
     $filePaths = @(".\PlayniteWatcher.ps1", ".\PrepCommandInstaller.ps1")
     foreach ($filePath in $filePaths) {
         $content = Get-Content -Encoding utf8 -Path $filePath
@@ -140,14 +154,14 @@ function SaveSettings() {
         $updatedContent = $content -replace $playNitePattern, "`$1$($playnitePath.Replace('\', '\\'))`$2"
         $updatedContent = $updatedContent -replace $configPattern, "`$1$($configPathTextBox.Text.Replace('\', '\\'))`$2"
         Set-Content -Path $filePath -Value $updatedContent
-    }        
+    }
 }
 
 # New function: Folder picker for Sunshine config folder
 function ShowFolderBrowserDialog($textBox, $initialDirectory) {
     $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
     $folderBrowser.SelectedPath = $initialDirectory
-    $folderBrowser.Description = "Select Sunshine Config Folder"
+    $folderBrowser.Description = "Select Sunshine/Apollo Config Folder"
     if ($folderBrowser.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $textBox.Text = $folderBrowser.SelectedPath
     }
@@ -175,12 +189,12 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Margin="10">
-            <Label Content="Sunshine Config Folder:" VerticalAlignment="Center" Width="165"/>
+            <Label Content="Sunshine/Apollo Config Folder:" VerticalAlignment="Center" Width="190"/>
             <TextBox Name="SunshineConfigFolder" Text="C:\Program Files\Sunshine\config" Margin="5,0,5,0" Width="325" Height="25" IsReadOnly="true"/>
             <Button Name="BrowseButton" Content="Browse" Width="75" HorizontalAlignment="Left" Margin="5,0,5,0" Height="25"/>
         </DockPanel>
         <DockPanel Grid.Row="1" Margin="10">
-            <Label Content="Playnite Executable Path:" VerticalAlignment="Center" Width="165"/>
+            <Label Content="Playnite Executable Path:" VerticalAlignment="Center" Width="190"/>
             <TextBox Name="PlaynitePath" Text="C:\Program Files\Playnite\Playnite.DesktopApp.exe" Margin="5,0,5,0" Width="325" Height="25" IsReadOnly="true"/>
             <Button Name="PlayniteBrowseButton" Content="Browse" Width="75" HorizontalAlignment="Left" Margin="5,0,5,0" Height="25"/>
         </DockPanel>
@@ -233,9 +247,10 @@ $window.FindName("InstallButton").Add_Click({
             imagePath       = "$scriptPath\playnite-boxart.png"
             cmd             = "powershell.exe -executionpolicy bypass -windowstyle hidden -file `"$scriptPath\PlayniteWatcher.ps1`" FullScreen"
             detached        = ""
-            waitAll         = "false"
-            autoDetach      = "false"
-            exitTimeout     = "5"
+            waitAll         = $false
+            autoDetach      = $false
+            exitTimeout     = 5
+            uuid            = "14D9821B-7EA2-48C2-9AF7-970608282F93"
         } + $updatedApps
     }
 
@@ -255,7 +270,7 @@ $window.FindName("InstallButton").Add_Click({
         Get-Process Playnite.DesktopApp -ErrorAction SilentlyContinue | Stop-Process -ErrorAction SilentlyContinue
         Start-Process -FilePath explorer.exe -ArgumentList $path
     }
-    
+
     [System.Windows.Forms.MessageBox]::Show("The script has been successfully installed to $installCount application(s)!", "Installation Complete!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
 })
 
