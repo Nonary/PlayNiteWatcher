@@ -62,9 +62,9 @@ function Set-GlobalPrepCommand {
         $Value = [object[]]@()
     }
 
-
+    $configPath = (Join-Path $sunshineConfigPath "sunshine.conf")
     # Read the contents of the configuration file into an array of strings
-    $config = Get-Content (Join-Path $sunshineConfigPath "sunshine.conf")
+    $configContent = Get-Content (Join-Path $sunshineConfigPath "sunshine.conf")
 
     # Get the current value of global_prep_cmd as a JSON string
     $currentValueJson = Get-GlobalPrepCommand -ConfigPath $sunshineConfigPath
@@ -74,24 +74,24 @@ function Set-GlobalPrepCommand {
 
     # Replace the current value with the new value in the config array
     try {
-        $config = $config -replace [regex]::Escape($currentValueJson), $newValueJson
+        $configContent = $configContent -replace [regex]::Escape($currentValueJson), $newValueJson
     }
     catch {
         # If it failed, it probably does not exist yet.
         # In the event the config only has one line, we will cast this to an object array so it appends a new line automatically.
 
         if ($Value.Length -eq 0) {
-            [object[]]$config += "global_prep_cmd = []"
+            [object[]]$configContent += "global_prep_cmd = []"
         }
         else {
-            [object[]]$config += "global_prep_cmd = $($newValueJson)"
+            [object[]]$configContent += "global_prep_cmd = $($newValueJson)"
         }
     }
 
 
 
     # Write the modified config array back to the file
-    $config | Set-Content -Path $sunshineConfigPath -Force
+    $configContent | Set-Content -Path $configPath -Force
 }
 
 # Add a new command to run PlayNiteWatcher.ps1 to the global_prep_cmd value
