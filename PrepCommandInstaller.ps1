@@ -6,6 +6,7 @@ $scriptPath = "$scriptRoot\OnScriptEnd.ps1"
 
 # Define the path to the Sunshine configuration file
 $sunshineConfigPath = "C:\\Program Files\\Sunshine\\config"
+$virtualDisplayEnabled = $false
 $scriptRoot = Split-Path $scriptPath -Parent
 
 

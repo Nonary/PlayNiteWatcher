@@ -15,6 +15,7 @@ class ApplicationInfo {
     [string]$detached
     [string]$imagePath
     [bool]$waitAll
+    [bool]$virtualDisplay
     [bool]$autoDetach
     [int]$exitTimeout
 }
@@ -59,6 +60,15 @@ function LoadPlayniteExecutablePath() {
     return $foundPath.Replace("\\", "\")
 }
 
+function LoadVirtualDisplaySetting() {
+    # Retrieve the virtual display setting from the primary script.
+    $scriptContents = Get-Content "./PlayniteWatcher.ps1"
+    $ma = $scriptContents | select-string '(\$virtualDisplayEnabled\s*=\s*)\$?(true|false)'
+    if ($ma) {
+        $enableVirtualDisplays.IsChecked = [System.Convert]::ToBoolean($ma.Matches.Groups[2].Value)
+    }
+}
+
 function SaveChanges($configPath, $updatedApps) {
     $appsJsonPath = Join-Path $configPath "apps.json"
     $appConfiguration = Get-Content -Encoding utf8 -Path $appsJsonPath -Raw | ConvertFrom-Json
@@ -73,6 +83,7 @@ function SaveChanges($configPath, $updatedApps) {
             'image-path'   = $app.imagePath
             name           = $app.applicationName
             'wait-all'     = $app.waitAll
+            'virtual-display' = $app.virtualDisplay
             'exit-timeout' = $app.exitTimeout
             'auto-detach'  = $app.autoDetach
             'uuid'         = $app.uuid
@@ -104,6 +115,7 @@ function ParseGames($configPath) {
             $app.imagePath = $_.'image-path'
             $app.cmd = $_.cmd
             $app.detached = $_.detached
+            $app.virtualDisplay = $enableVirtualDisplays.IsChecked
             $app.exitTimeout = if ($_.'exit-timeout') { $_.'exit-timeout' } else { 0 }
 
             $app.waitAll = if ($_.'wait-all') {
@@ -151,8 +163,10 @@ function SaveSettings() {
         $content = Get-Content -Encoding utf8 -Path $filePath
         $playNitePattern = '(\$playNitePath\s*=\s*")[^"]*(")'
         $configPattern = '(\$sunshineConfigPath\s*=\s*")[^"]*(")'
+        $virtualDisplayPattern = '(\$virtualDisplayEnabled\s*=\s*)\$?(true|false)'
         $updatedContent = $content -replace $playNitePattern, "`$1$($playnitePath.Replace('\', '\\'))`$2"
         $updatedContent = $updatedContent -replace $configPattern, "`$1$($configPathTextBox.Text.Replace('\', '\\'))`$2"
+        $updatedContent = $updatedContent -replace $virtualDisplayPattern, "`$1`$$($enableVirtualDisplays.IsChecked.ToString().ToLower())"
         Set-Content -Path $filePath -Value $updatedContent
     }
 }
@@ -180,9 +194,10 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Playnite Watcher Installer" Height="230" Width="720">
+        Title="Playnite Watcher Installer" Height="250" Width="720">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -198,11 +213,14 @@ function ShowOpenFileDialog($filter, $initialDirectory, $textBox) {
             <TextBox Name="PlaynitePath" Text="C:\Program Files\Playnite\Playnite.DesktopApp.exe" Margin="5,0,5,0" Width="325" Height="25" IsReadOnly="true"/>
             <Button Name="PlayniteBrowseButton" Content="Browse" Width="75" HorizontalAlignment="Left" Margin="5,0,5,0" Height="25"/>
         </DockPanel>
-        <DockPanel Grid.Row="2" Margin="10" VerticalAlignment="Top">
+        <DockPanel Grid.Row="2" Margin="10">
+            <CheckBox Name="EnableVirtualDisplays" Content="Enable Virtual Displays" VerticalAlignment="Center" Margin="5,0,5,0"/>
+        </DockPanel>
+        <DockPanel Grid.Row="3" Margin="10" VerticalAlignment="Top">
             <Button Name="InstallButton" Content="Install" Width="75" Height="25" Margin="2,0,2,0"/>
             <Button Name="UninstallButton" Content="Uninstall" Width="75" Height="25" Margin="2,0,2,0"/>
         </DockPanel>
-        <TextBlock Grid.Row="3" Margin="0" TextWrapping="Wrap" HorizontalAlignment="Center" FontWeight="Bold">
+        <TextBlock Grid.Row="4" Margin="0" TextWrapping="Wrap" HorizontalAlignment="Center" FontWeight="Bold">
         NOTICE: Clicking install or uninstall will terminate existing Moonlight sessions and restart Playnite to finish the installation.
         </TextBlock>
     </Grid>
@@ -214,6 +232,7 @@ $window = [Windows.Markup.XamlReader]::Load($reader)
 
 $configPathTextBox = $window.FindName("SunshineConfigFolder")
 $playNitePathTextBox = $window.FindName("PlaynitePath")
+$enableVirtualDisplays = $window.FindName("EnableVirtualDisplays")
 
 # Config folder Browse button click event handler using folder picker
 $window.FindName("BrowseButton").Add_Click({
@@ -224,6 +243,11 @@ $window.FindName("BrowseButton").Add_Click({
 
 $window.FindName("PlayniteBrowseButton").Add_Click({
     ShowOpenFileDialog -filter "Playnite Executable|Playnite.DesktopApp.exe" -initialDirectory ([System.IO.Path]::GetDirectoryName($playNitePathTextBox.Text)) -textBox $playNitePathTextBox
+    SaveSettings
+})
+
+# Add click event handler for virtual display checkbox
+$window.FindName("EnableVirtualDisplays").Add_Click({
     SaveSettings
 })
 
@@ -249,6 +273,7 @@ $window.FindName("InstallButton").Add_Click({
             detached        = ""
             waitAll         = $false
             autoDetach      = $false
+            virtualDisplay  = $enableVirtualDisplays.IsChecked
             exitTimeout     = 0
             uuid            = "14D9821B-7EA2-48C2-9AF7-970608282F93"
         } + $updatedApps
@@ -314,6 +339,8 @@ $window.Add_Loaded({
         [System.Windows.Forms.MessageBox]::Show("An issue was encountered while attempting to retrieve the PlayNite executable path. Once you dismiss this message, a window will open, prompting you to locate the PlayNite folder. Please ensure that you choose the PlayNite folder and select the `Playnite.DesktopApp.exe` file within it.", "Error: Could not find PlayNite Executable", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
         ShowOpenFileDialog -filter "Playnite Exe|Playnite.DesktopApp.exe|All files (*.*)|*.*" -initialDirectory $env:ProgramFiles -textBox $playNitePathTextBox
     }
+
+    LoadVirtualDisplaySetting
     SaveSettings
 })
 
