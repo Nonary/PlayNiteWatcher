@@ -28,7 +28,17 @@ Before you begin, ensure:
 
 - Your host computer is Windows-based.
 - Sunshine is installed, version [v2025.122.141614](https://github.com/LizardByte/Sunshine/releases/tag/v2025.122.141614) or higher.
+---
 
+# Vibeshine (Custom Fork)
+
+If you want a smoother experience, Vibeshine lets you automatically sync Playnite games directly to Sunshine.  
+You can also add or remove games manually from the WebUI, so there’s no need for extra scripts.  
+
+👉 Check it out here: [Vibeshine on GitHub](https://github.com/Nonary/vibeshine/releases/latest)
+
+If you’d rather stick with the original Sunshine and Apollo, you can skip this and continue with the section below.
+---
 
 ## Setup Instructions
 
